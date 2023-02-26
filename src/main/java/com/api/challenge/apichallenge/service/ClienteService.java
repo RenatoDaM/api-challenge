@@ -7,14 +7,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,8 +51,9 @@ public class ClienteService {
 
         List<Cliente> clientes = new ArrayList<>();
         JSONClienteMapper.parseClienteJson(JSON_SOURCE, clientes);
+        List<Cliente> sortedClienteList = clientes.stream().sorted(Comparator.comparing(Cliente::getNome)).collect(Collectors.toList());
 
-        return paginarLista(clientes, pageable);
+        return paginarLista(sortedClienteList, pageable);
 
     }
 
