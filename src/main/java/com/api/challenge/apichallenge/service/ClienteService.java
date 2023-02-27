@@ -2,19 +2,24 @@ package com.api.challenge.apichallenge.service;
 
 import com.api.challenge.apichallenge.config.HttpHeaders;
 import com.api.challenge.apichallenge.mapper.JSONClienteMapper;
-import com.api.challenge.apichallenge.model.Cliente;
+import com.api.challenge.apichallenge.response.ClienteResponse;
+import com.api.challenge.apichallenge.response.Record;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +31,7 @@ public class ClienteService {
     // GET
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
-    public Page<Cliente> getClientes(Pageable pageable) throws JsonProcessingException {
+    public Page<ClienteResponse> getClientes(Pageable pageable) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
@@ -42,26 +47,21 @@ public class ClienteService {
 
         String JSON_SOURCE = record.block();
 
-        // Aqui houve muitas alternativas para fazer o mapeamento, das que pesquisei
-        // a mais simples e que seria menos necessário criar classes em vão foi o json.org.
-        // Outra alternativa interessante seria o GSON.
-        // Pelo jackson me parece que a forma mais comum seria realmente criar
-        // classes "nestadas" igual o json, mas talvez haja uma forma mais inteligente
-        // customizando por exemplo o ObjectMapper ou alguma utilização da biblioteca jackson.
+        JsonNode jsonNode = objectMapper.readTree(JSON_SOURCE);
+        JsonNode clientesNode = jsonNode.get("record");
+        Record clientes = objectMapper.readValue(clientesNode.traverse(), new TypeReference<Record>(){});
+        List<ClienteResponse> clienteList = clientes.getRecord().stream().sorted(Comparator.comparing(ClienteResponse::getNome)).collect(Collectors.toList());
+        paginarLista(clienteList, pageable);
 
-        List<Cliente> clientes = new ArrayList<>();
-        JSONClienteMapper.parseClienteJson(JSON_SOURCE, clientes);
-        List<Cliente> sortedClienteList = clientes.stream().sorted(Comparator.comparing(Cliente::getNome)).collect(Collectors.toList());
-
-        return paginarLista(sortedClienteList, pageable);
+        return paginarLista(clienteList, pageable);
 
     }
 
-    private Page<Cliente> paginarLista(List<Cliente> lista, Pageable pageable){
+    private Page<ClienteResponse> paginarLista(List<ClienteResponse> lista, Pageable pageable){
         int inicio, fim;
         inicio = (int) pageable.getOffset();
         fim = (inicio + pageable.getPageSize()) > lista.size() ? lista.size() : (inicio + pageable.getPageSize());
-        Page<Cliente> paginacao = new PageImpl<Cliente>(lista.stream().collect(Collectors.toList()).subList(inicio, fim), pageable, lista.size());
+        Page<ClienteResponse> paginacao = new PageImpl<ClienteResponse>(lista.stream().collect(Collectors.toList()).subList(inicio, fim), pageable, lista.size());
         return paginacao;
     }
 }

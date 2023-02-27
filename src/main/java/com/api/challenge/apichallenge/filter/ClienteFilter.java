@@ -1,6 +1,6 @@
 package com.api.challenge.apichallenge.filter;
 
-import com.api.challenge.apichallenge.model.Cliente;
+import com.api.challenge.apichallenge.response.ClienteResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
@@ -9,23 +9,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ClienteFilter {
-    public static Page<Cliente> filterCliente(Page<Cliente> clientes, Integer idade, String sexo, String aniversario) {
+    public static Page<ClienteResponse> filterCliente(Page<ClienteResponse> clientes, Integer idade, String sexo, String aniversario) {
         if (sexo == null && idade == null && aniversario == null) {
             return clientes;
         }
 
-        List<Cliente> newClienteList = new ArrayList<>();
+        List<ClienteResponse> newClienteListResponse = new ArrayList<>();
 
         if (idade != null) {
-            newClienteList = clientes.stream().filter(cliente -> cliente.getIdade() == idade).collect(Collectors.toList());
+            newClienteListResponse = clientes.stream().filter(cliente -> cliente.getIdade() == idade).collect(Collectors.toList());
         }
         if (sexo != null) {
-            newClienteList = newClienteList.stream().filter(cliente -> cliente.getSexo() == sexo).collect(Collectors.toList());
+            newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getSexo() == sexo).collect(Collectors.toList());
         }
         if (aniversario != null) {
-            newClienteList = newClienteList.stream().filter(cliente -> cliente.getAniversario() == aniversario).collect(Collectors.toList());
+            newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getDataNascimento().toString() == aniversario).collect(Collectors.toList());
         }
-        Page<Cliente> clientePage = new PageImpl<>(newClienteList);
+        Page<ClienteResponse> clientePage = new PageImpl<>(newClienteListResponse);
 
         return  clientePage;
     }
