@@ -1,9 +1,10 @@
 package com.api.challenge.apichallenge.controller;
 
 import static com.api.challenge.apichallenge.filter.ClienteFilter.filterCliente;
-import com.api.challenge.apichallenge.response.ClienteResponse;
+import static com.api.challenge.apichallenge.filter.ClienteFilter.filterClienteV2;
+import com.api.challenge.apichallenge.response.v1.ClienteResponse;
+import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.service.ClienteService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("api-challenge/cliente/v1")
+@RequestMapping("api-challenge/cliente")
 public class ClienteController {
     @Autowired
     ClienteService clienteService;
 
-    @RequestMapping("/buscarClientes")
+    @RequestMapping("/v1/buscarClientes")
     public Page<ClienteResponse> getClientes(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(value = "idade", required = false) Integer idade,
@@ -29,5 +30,16 @@ public class ClienteController {
 
         //FiltroCliente
         return filterCliente(clienteService.getClientes(pageable), idade, sexo, aniversario);
+    }
+
+    @RequestMapping("/v2/buscarClientes")
+    public Page<ClienteResponseV2> getClientesV2(
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(value = "idade", required = false) Integer idade,
+            @RequestParam(value = "sexo", required = false) String sexo,
+            @RequestParam(value = "aniversario", required = false) String aniversario) throws IOException {
+
+        //FiltroCliente
+        return filterClienteV2(clienteService.getClientesV2(pageable), idade, sexo, aniversario);
     }
 }

@@ -1,10 +1,11 @@
-package com.api.challenge.apichallenge.response;
+package com.api.challenge.apichallenge.response.v1;
 
+import com.api.challenge.apichallenge.response.v1.ClienteResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
-public class Record {
+public class ClienteResponseWrapper {
+
     @JsonProperty("clientes")
     List<ClienteResponse> clienteResponses;
 
