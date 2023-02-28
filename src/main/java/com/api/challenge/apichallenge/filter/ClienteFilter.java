@@ -4,6 +4,7 @@ import com.api.challenge.apichallenge.response.v1.ClienteResponse;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -32,10 +33,10 @@ public class ClienteFilter {
         return  clientePage;
     }
 
-    public static Mono<Page<ClienteResponseV2>> filterClienteV2(Mono<Page<ClienteResponseV2>> clientesMono, Integer idade, String sexo, String aniversario) {
-        return clientesMono.flatMap(clientes -> {
+    public static Flux<Page<ClienteResponseV2>> filterClienteV2(Flux<Page<ClienteResponseV2>> clientesFlux, Integer idade, String sexo, String aniversario) {
+        return clientesFlux.flatMap(clientes -> {
             if (sexo == null && idade == null && aniversario == null) {
-                return Mono.just(clientes);
+                return Flux.just(clientes);
             }
 
             List<ClienteResponseV2> newClienteListResponse = new ArrayList<>();
@@ -51,7 +52,7 @@ public class ClienteFilter {
             }
 
             Page<ClienteResponseV2> clientePage = new PageImpl<>(newClienteListResponse);
-            return Mono.just(clientePage);
+            return Flux.just(clientePage);
         });
     }
 }

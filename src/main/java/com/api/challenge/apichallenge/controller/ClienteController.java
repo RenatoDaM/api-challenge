@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -35,15 +36,13 @@ public class ClienteController {
     }
 
     @RequestMapping("/v2/buscarClientes")
-    public Mono<ResponseEntity<Page<ClienteResponseV2>>> getClientesV2(
+    public ResponseEntity<Flux<Page<ClienteResponseV2>>> getClientesV2(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(value = "idade", required = false) Integer idade,
             @RequestParam(value = "sexo", required = false) String sexo,
             @RequestParam(value = "aniversario", required = false) String aniversario) throws IOException {
 
-        //FiltroCliente
-        return filterClienteV2(clienteService.getClientesV2(pageable), idade, sexo, aniversario)
-                .map(clientes -> ResponseEntity.ok(clientes))
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+        Flux<Page<ClienteResponseV2>> clientesFlux = filterClienteV2(clienteService.getClientesV2(pageable), idade, sexo, aniversario);
+        return ResponseEntity.ok().body(clientesFlux);
     }
 }

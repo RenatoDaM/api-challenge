@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.Comparator;
@@ -24,6 +25,8 @@ import java.util.stream.IntStream;
 
 @Service
 public class ClienteService {
+    @Autowired
+    ModelMapper mapper;
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
@@ -53,29 +56,30 @@ public class ClienteService {
 
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
-    public Mono<Page<ClienteResponseV2>> getClientesV2(Pageable pageable) {
-        Mono<String> record = client.get()
+    public Flux<Page<ClienteResponseV2>> getClientesV2(Pageable pageable) {
+        Flux<String> record = client.get()
                 .uri("/b/63fa39efc0e7653a057e6fa7")
                 .retrieve()
-                .bodyToMono(String.class);
+                .bodyToFlux(String.class);
 
-        return record.map(this:: parseJson)
+        return record.map(this::parseJson)
                 .map(this::extrairNodeClientes)
                 .map(this::mapearParaListaDeClientes)
-                .map(clientes -> {
+                .flatMap(clientes -> {
 
-                    ModelMapper mapper = new ModelMapper();
-
-                    List<ClienteResponseV2> clienteResponseList = clientes.getRecord().stream()
+                    Flux<ClienteResponseV2> flux = Flux.fromIterable(clientes.getRecord())
                             .map(cliente -> mapper.map(cliente, ClienteResponseV2.class))
                             .map(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento)
-                            .sorted(Comparator.comparing(ClienteResponseV2::getNome))
-                            .collect(Collectors.toList());
+                            .sort(Comparator.comparing(ClienteResponseV2::getNome))
+                            .zipWith(Flux.range(1, clientes.getRecord().size()) ,
+                                    (clienteResponse, id) -> {
+                                        clienteResponse.setId(id);
+                                        return clienteResponse;
+                                    });
 
-                    adicionarIds(clienteResponseList);
-
-        return paginarListaV2(clienteResponseList, pageable);
+                    return paginarListaV2(flux, pageable);
                 });
+
     }
 
     private Page<ClienteResponse> paginarLista(List<ClienteResponse> lista, Pageable pageable){
@@ -86,22 +90,18 @@ public class ClienteService {
         return paginacao;
     }
 
-    private Page<ClienteResponseV2> paginarListaV2(List<ClienteResponseV2> lista, Pageable pageable){
-        int inicio, fim;
-        inicio = (int) pageable.getOffset();
-        fim = (inicio + pageable.getPageSize()) > lista.size() ? lista.size() : (inicio + pageable.getPageSize());
-        Page<ClienteResponseV2> paginacao = new PageImpl<ClienteResponseV2>(lista.stream().collect(Collectors.toList()).subList(inicio, fim), pageable, lista.size());
-        return paginacao;
+    public Flux<PageImpl<ClienteResponseV2>> paginarListaV2(Flux<ClienteResponseV2> flux, Pageable pageable) {
+        return flux.collectList()
+                .map(lista -> {
+                    int total = lista.size();
+                    int from = (int) pageable.getOffset();
+                    int to = Math.min(from + pageable.getPageSize(), total);
+
+                    List<ClienteResponseV2> sublist = lista.subList(from, to);
+                    return new PageImpl<>(sublist, pageable, total);
+                })
+                .flux();
     }
-
-    private List<ClienteResponseV2> adicionarIds(List<ClienteResponseV2> clienteResponseList) {
-        IntStream.rangeClosed(1, clienteResponseList.size())
-                .boxed()
-                .forEach(i -> clienteResponseList.get(i-1).setId(i));
-
-        return clienteResponseList;
-    }
-
 
     private JsonNode parseJson(String json) {
         try {
