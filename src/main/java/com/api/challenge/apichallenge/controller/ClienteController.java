@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
@@ -22,24 +24,26 @@ public class ClienteController {
     ClienteService clienteService;
 
     @RequestMapping("/v1/buscarClientes")
-    public Page<ClienteResponse> getClientes(
+    public ResponseEntity<Page<ClienteResponse>> getClientes(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(value = "idade", required = false) Integer idade,
             @RequestParam(value = "sexo", required = false) String sexo,
             @RequestParam(value = "aniversario", required = false) String aniversario) throws IOException {
 
         //FiltroCliente
-        return filterCliente(clienteService.getClientes(pageable), idade, sexo, aniversario);
+        return ResponseEntity.ok().body(filterCliente(clienteService.getClientes(pageable), idade, sexo, aniversario));
     }
 
     @RequestMapping("/v2/buscarClientes")
-    public Page<ClienteResponseV2> getClientesV2(
+    public Mono<ResponseEntity<Page<ClienteResponseV2>>> getClientesV2(
             @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(value = "idade", required = false) Integer idade,
             @RequestParam(value = "sexo", required = false) String sexo,
             @RequestParam(value = "aniversario", required = false) String aniversario) throws IOException {
 
         //FiltroCliente
-        return filterClienteV2(clienteService.getClientesV2(pageable), idade, sexo, aniversario);
+        return filterClienteV2(clienteService.getClientesV2(pageable), idade, sexo, aniversario)
+                .map(clientes -> ResponseEntity.ok(clientes))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }
