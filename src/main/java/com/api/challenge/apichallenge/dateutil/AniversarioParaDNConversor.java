@@ -12,7 +12,7 @@ public class AniversarioParaDNConversor {
     public AniversarioParaDNConversor() {
     }
 
-    public ClienteResponse formatarAniversarioParaDataNascimento(ClienteResponse clienteResponse) {
+    public static ClienteResponse formatarAniversarioParaDataNascimento(ClienteResponse clienteResponse) {
 
         Locale LOCALE_BRAZIL = new Locale("pt", "BR");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", LOCALE_BRAZIL);
@@ -24,7 +24,7 @@ public class AniversarioParaDNConversor {
         return clienteResponse;
     }
 
-    public ClienteResponseV2 formatarAniversarioParaDataNascimento(ClienteResponseV2 clienteResponseV2) {
+    public static ClienteResponseV2 formatarAniversarioParaDataNascimento(ClienteResponseV2 clienteResponseV2) {
 
         Locale LOCALE_BRAZIL = new Locale("pt", "BR");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", LOCALE_BRAZIL);
@@ -36,7 +36,7 @@ public class AniversarioParaDNConversor {
         return clienteResponseV2;
     }
 
-    public LocalDate ajustarDataNascimentoSeMesNascMaior(LocalDate dataNascimento) {
+    public static LocalDate ajustarDataNascimentoSeMesNascMaior(LocalDate dataNascimento) {
         LocalDate hoje = LocalDate.now();
         if (dataNascimento.getMonth().compareTo(hoje.getMonth()) > 0) {
             dataNascimento = dataNascimento.minusYears(1);

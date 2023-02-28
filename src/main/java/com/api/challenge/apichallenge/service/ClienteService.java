@@ -8,7 +8,6 @@ import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseWrapperV2;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
@@ -27,19 +26,14 @@ import java.util.stream.IntStream;
 public class ClienteService {
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    WebClient client;
     // POST
 
     // GET
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
     public Page<ClienteResponse> getClientes(Pageable pageable) throws IOException {
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-        WebClient client = WebClient.builder()
-                .baseUrl("https://api.jsonbin.io/v3")
-                .defaultHeader(HttpHeaders.AUTHORIZATION_KEY, HttpHeaders.AUTHORIZATION_VALUE)
-                .build();
-
         Mono<String> record = client.get()
                 .uri("/b/63fa39efc0e7653a057e6fa7")
                 .retrieve()
@@ -60,39 +54,26 @@ public class ClienteService {
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
     public Page<ClienteResponseV2> getClientesV2(Pageable pageable) throws IOException {
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-        WebClient client = WebClient.builder()
-                .baseUrl("https://api.jsonbin.io/v3")
-                .defaultHeader(HttpHeaders.AUTHORIZATION_KEY, HttpHeaders.AUTHORIZATION_VALUE)
-                .build();
-
         Mono<String> record = client.get()
                 .uri("/b/63fa39efc0e7653a057e6fa7")
                 .retrieve()
                 .bodyToMono(String.class);
 
         String JSON_SOURCE = record.block();
-
         JsonNode jsonNode = objectMapper.readTree(JSON_SOURCE);
         JsonNode clientesNode = jsonNode.get("record");
         ClienteResponseWrapperV2 clientes = objectMapper.readValue(clientesNode.traverse(), new TypeReference<ClienteResponseWrapperV2>(){});
 
         ModelMapper mapper = new ModelMapper();
-
         List<ClienteResponseV2> clienteResponseList = clientes.getRecord().stream()
                 .map(cliente -> mapper.map(cliente, ClienteResponseV2.class))
+                .map(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento)
                 .sorted(Comparator.comparing(ClienteResponseV2::getNome))
                 .collect(Collectors.toList());
 
-        AniversarioParaDNConversor conversor = new AniversarioParaDNConversor();
-        clienteResponseList.forEach(element -> conversor.formatarAniversarioParaDataNascimento(element));
-
         IntStream.rangeClosed(1, clienteResponseList.size())
                 .boxed()
-                .forEach(i -> {
-                    clienteResponseList.get(i-1).setId(i);
-                });
+                .forEach(i -> clienteResponseList.get(i-1).setId(i));
 
         return paginarListaV2(clienteResponseList, pageable);
     }
