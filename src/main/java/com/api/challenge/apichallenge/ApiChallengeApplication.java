@@ -10,10 +10,6 @@ public class ApiChallengeApplication {
 
     public static void main(String[] args) throws JsonProcessingException {
         SpringApplication.run(ApiChallengeApplication.class, args);
-        System.out.println("hello");
-        ClienteService clienteService = new ClienteService();
-        clienteService.postCSV();
-
     }
 
 }

@@ -6,7 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class WebClientConfiguration {
+public class WebConfig {
+
+    public static final String CSV_FILE_PATH = "D:\\FACULDADE\\";
+
     @Bean
     public WebClient webClient() {
         WebClient client = WebClient.builder()

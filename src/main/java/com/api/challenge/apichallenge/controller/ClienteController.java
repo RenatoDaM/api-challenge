@@ -29,7 +29,7 @@ public class ClienteController {
     ClienteService clienteService;
 
     @PostMapping("/v2/criarCSV")
-    public ResponseEntity<Mono<Response>> postarCSV() {
+    public ResponseEntity<Flux<Object>> postarCSV() {
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.postCSV());
     }
 

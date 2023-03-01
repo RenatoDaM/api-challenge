@@ -1,4 +1,4 @@
-package com.api.challenge.apichallenge.dateutil;
+package com.api.challenge.apichallenge.util.dateutil;
 
 import com.api.challenge.apichallenge.response.v1.ClienteResponse;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
