@@ -1,5 +1,6 @@
 package com.api.challenge.apichallenge.config;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,5 +14,11 @@ public class WebClientConfiguration {
                 .defaultHeader(HttpHeaders.AUTHORIZATION_KEY, HttpHeaders.AUTHORIZATION_VALUE)
                 .build();
         return client;
+    }
+
+    @Bean
+    public ModelMapper mapper() {
+        ModelMapper mapper = new ModelMapper();
+        return mapper;
     }
 }

@@ -20,6 +20,7 @@ dependencies {
     implementation group: 'org.json', name: 'json', version: '20220924'
     implementation group: 'org.springframework.data', name: 'spring-data-commons', version: '2.7.8'
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.1.1'
+    implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 }
 
 tasks.named('test') {
