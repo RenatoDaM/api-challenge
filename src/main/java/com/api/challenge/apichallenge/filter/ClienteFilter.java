@@ -23,10 +23,10 @@ public class ClienteFilter {
             newClienteListResponse = clientes.stream().filter(cliente -> cliente.getIdade() == idade).collect(Collectors.toList());
         }
         if (sexo != null) {
-            newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getSexo() == sexo).collect(Collectors.toList());
+            newClienteListResponse = clientes.stream().filter(cliente -> cliente.getSexo().equals(sexo)).collect(Collectors.toList());
         }
         if (aniversario != null) {
-            newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getDataNascimento().toString() == aniversario).collect(Collectors.toList());
+            newClienteListResponse = clientes.stream().filter(cliente -> cliente.getDataNascimento().equals(aniversario)).collect(Collectors.toList());
         }
         Page<ClienteResponse> clientePage = new PageImpl<>(newClienteListResponse);
 
@@ -38,17 +38,18 @@ public class ClienteFilter {
             if (sexo == null && idade == null && aniversario == null) {
                 return Flux.just(clientes);
             }
-
             List<ClienteResponseV2> newClienteListResponse = new ArrayList<>();
 
             if (idade != null) {
                 newClienteListResponse = clientes.stream().filter(cliente -> cliente.getIdade() == idade).collect(Collectors.toList());
             }
             if (sexo != null) {
-                newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getSexo() == sexo).collect(Collectors.toList());
+                System.out.println(clientes.getContent().get(0).getSexo());;
+
+                newClienteListResponse = clientes.stream().filter(cliente -> cliente.getSexo().equals(sexo)).collect(Collectors.toList());
             }
             if (aniversario != null) {
-                newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getDataNascimento().toString() == aniversario).collect(Collectors.toList());
+                newClienteListResponse = clientes.stream().filter(cliente -> cliente.getDataNascimento().equals(aniversario)).collect(Collectors.toList());
             }
 
             Page<ClienteResponseV2> clientePage = new PageImpl<>(newClienteListResponse);
