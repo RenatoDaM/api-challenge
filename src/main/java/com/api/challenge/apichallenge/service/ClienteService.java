@@ -1,6 +1,7 @@
 package com.api.challenge.apichallenge.service;
 
 import com.api.challenge.apichallenge.dateutil.AniversarioParaDNConversor;
+import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteResponse;
 import com.api.challenge.apichallenge.response.v1.ClienteResponseWrapper;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
@@ -32,7 +33,27 @@ public class ClienteService {
     @Autowired
     WebClient client;
     // POST
-
+    @SuppressWarnings("unchecked")
+    @JsonProperty("brand")
+    public Mono<Response> postCSV() {
+        return client.get()
+                .uri("/b/63fa39efc0e7653a057e6fa7")
+                .retrieve()
+                .bodyToMono(String.class)
+                .map(this::parseJson)
+                .map(this::extrairNodeClientes)
+                .map(this::mapearParaListaDeClientes)
+                .flatMap(clientes -> {
+                    List<ClienteResponseV2> clienteResponseV2Mono = clientes.getRecord();
+                    // Precisa ordenar, adicionar id. Também seria interessante os Query Params.
+                    // Uma possibilidade é chamar o getClientes() aqui dentro ao invés de repetir código.
+                    System.out.println(clienteResponseV2Mono);
+                    return Mono.just(clienteResponseV2Mono);
+                })
+                // É possível que eu não retorne um Response, pois assim poderia usar dos Query Params.
+                // Também é possível q no body eu devolva um CSV dependendo da regra de negócio.
+                .then(Mono.just(new Response(204, "Postado")));
+    }
     // GET
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
@@ -71,12 +92,11 @@ public class ClienteService {
                             .map(cliente -> mapper.map(cliente, ClienteResponseV2.class))
                             .map(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento)
                             .sort(Comparator.comparing(ClienteResponseV2::getNome))
-                            .zipWith(Flux.range(1, clientes.getRecord().size()) ,
+                            .zipWith(Flux.range(1, clientes.getRecord().size()),
                                     (clienteResponse, id) -> {
                                         clienteResponse.setId(id);
                                         return clienteResponse;
                                     });
-
                     return paginarListaV2(flux, pageable);
                 });
 

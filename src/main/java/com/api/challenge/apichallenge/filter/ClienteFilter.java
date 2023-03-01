@@ -5,8 +5,6 @@ import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;

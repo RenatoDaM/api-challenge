@@ -12,6 +12,7 @@ public class ApiChallengeApplication {
         SpringApplication.run(ApiChallengeApplication.class, args);
         System.out.println("hello");
         ClienteService clienteService = new ClienteService();
+        clienteService.postCSV();
 
     }
 
