@@ -80,8 +80,6 @@ public class ClienteService {
                 });
                 // É possível que eu não retorne um Response, pois assim poderia usar dos Query Params.
                 // Também é possível q no body eu devolva um CSV dependendo da regra de negócio.
-
-
     }
     // GET
     @SuppressWarnings("unchecked")
