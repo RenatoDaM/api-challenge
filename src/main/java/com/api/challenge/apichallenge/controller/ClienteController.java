@@ -1,9 +1,5 @@
 package com.api.challenge.apichallenge.controller;
 
-import static com.api.challenge.apichallenge.filter.ClienteFilter.filterCliente;
-import static com.api.challenge.apichallenge.filter.ClienteFilter.filterClienteV2;
-
-import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteResponse;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.service.ClienteService;
@@ -13,20 +9,28 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import static com.api.challenge.apichallenge.filter.ClienteFilter.*;
 
 @RestController
 @RequestMapping("api-challenge/cliente")
 public class ClienteController {
     @Autowired
     ClienteService clienteService;
+
+    @GetMapping("/v2/lerCSV")
+    public ResponseEntity<Page<ClienteResponseV2>> lerCSV(
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(value = "idade", required = false) Integer idade,
+            @RequestParam(value = "sexo", required = false) String sexo,
+            @RequestParam(value = "aniversario", required = false) String aniversario) throws  FileNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(filterClienteCSV(clienteService.readCSV(pageable), idade, sexo, aniversario));
+    }
 
     @PostMapping("/v2/criarCSV")
     public ResponseEntity<Flux<Object>> postarCSV() {

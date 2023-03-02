@@ -1,13 +1,19 @@
 package com.api.challenge.apichallenge.response.v2;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.opencsv.bean.CsvBindByPosition;
+import com.opencsv.bean.CsvNumber;
 
 public class ClienteResponseV2 {
+    @CsvBindByPosition(position = 0)
     Integer id;
+    @CsvBindByPosition(position = 1)
     String nome;
+    @CsvBindByPosition(position = 2)
     int idade;
+    @CsvBindByPosition(position = 3)
     String sexo;
-
+    @CsvBindByPosition(position = 4)
     String dataNascimento;
 
 

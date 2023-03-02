@@ -10,7 +10,30 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ClienteFilter {
+    public static Page<ClienteResponseV2> filterClienteCSV(Page<ClienteResponseV2> clientes, Integer idade, String sexo, String aniversario) {
+
+        if (sexo == null && idade == null && aniversario == null) {
+            return clientes;
+        }
+
+        List<ClienteResponseV2> newClienteListResponse = new ArrayList<>();
+
+        if (idade != null) {
+            newClienteListResponse = clientes.stream().filter(cliente -> cliente.getIdade() == idade).collect(Collectors.toList());
+        }
+        if (sexo != null) {
+            newClienteListResponse = clientes.stream().filter(cliente -> cliente.getSexo().equalsIgnoreCase(sexo)).collect(Collectors.toList());
+        }
+        if (aniversario != null) {
+            newClienteListResponse = clientes.stream().filter(cliente -> cliente.getDataNascimento().equals(aniversario)).collect(Collectors.toList());
+        }
+        Page<ClienteResponseV2> clientePage = new PageImpl<>(newClienteListResponse);
+
+        return  clientePage;
+    }
+
     public static Page<ClienteResponse> filterCliente(Page<ClienteResponse> clientes, Integer idade, String sexo, String aniversario) {
+
         if (sexo == null && idade == null && aniversario == null) {
             return clientes;
         }
@@ -21,7 +44,7 @@ public class ClienteFilter {
             newClienteListResponse = clientes.stream().filter(cliente -> cliente.getIdade() == idade).collect(Collectors.toList());
         }
         if (sexo != null) {
-            newClienteListResponse = clientes.stream().filter(cliente -> cliente.getSexo().equals(sexo)).collect(Collectors.toList());
+            newClienteListResponse = clientes.stream().filter(cliente -> cliente.getSexo().equalsIgnoreCase(sexo)).collect(Collectors.toList());
         }
         if (aniversario != null) {
             newClienteListResponse = clientes.stream().filter(cliente -> cliente.getDataNascimento().equals(aniversario)).collect(Collectors.toList());
@@ -44,7 +67,7 @@ public class ClienteFilter {
             if (sexo != null) {
                 System.out.println(clientes.getContent().get(0).getSexo());;
 
-                newClienteListResponse = clientes.stream().filter(cliente -> cliente.getSexo().equals(sexo)).collect(Collectors.toList());
+                newClienteListResponse = clientes.stream().filter(cliente -> cliente.getSexo().equalsIgnoreCase(sexo)).collect(Collectors.toList());
             }
             if (aniversario != null) {
                 newClienteListResponse = clientes.stream().filter(cliente -> cliente.getDataNascimento().equals(aniversario)).collect(Collectors.toList());

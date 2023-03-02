@@ -1,20 +1,22 @@
-package com.api.challenge.apichallenge.util;
+package com.api.challenge.apichallenge.util.csv;
 
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
-import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
+import com.opencsv.bean.CsvToBeanBuilder;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.List;
 
-public class ClienteCSVWriter {
+public class ClienteCSVHandler {
     private final String filePath;
 
-    public ClienteCSVWriter(String filePath) {
+    public ClienteCSVHandler(String filePath) {
         this.filePath = filePath;
     }
 
@@ -32,6 +34,22 @@ public class ClienteCSVWriter {
                 csvWriter.writeNext(linha);
 
         csvWriter.close();
+    }
+
+    public List<ClienteResponseV2> read() throws FileNotFoundException {
+
+        CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath + "listaDeClientes.csv"))
+                .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
+                .build();
+
+        List<ClienteResponseV2> clienteList = new CsvToBeanBuilder(csvReader)
+                .withType(ClienteResponseV2.class)
+                .withFilter(new ClienteCSVFilter())
+                .build()
+                .parse();
+
+        clienteList.forEach(e -> System.out.println(e.getNome()));
+        return clienteList;
     }
 
 
