@@ -1,6 +1,8 @@
 package com.api.challenge.apichallenge.util;
 
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVWriter;
 
 import java.io.FileWriter;
@@ -17,15 +19,16 @@ public class ClienteCSVWriter {
     }
 
     public void write(ClienteResponseV2 pessoa) throws IOException {
-        FileWriter fileWriter = new FileWriter(filePath + "listaDeClientes", true);
-        CSVWriter csvWriter = new CSVWriter(fileWriter);
+        FileWriter fileWriter = new FileWriter(filePath + "listaDeClientes.csv", true);
 
-        String[] header = {"Id", "Nome", "Idade", "Sexo", "DataNascimento"};
-        csvWriter.writeNext(header);
+        CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
 
-                System.out.println(pessoa.getNome());
                 String[] linha = {Integer.toString(pessoa.getId()), pessoa.getNome(),
                         Integer.toString(pessoa.getIdade()), pessoa.getSexo(), pessoa.getDataNascimento()};
+                if (linha[0].equals("1")) {
+                    String[] header = {"Id", "Nome", "Idade", "Sexo", "DataNascimento"};
+                    csvWriter.writeNext(header);
+                }
                 csvWriter.writeNext(linha);
 
         csvWriter.close();
