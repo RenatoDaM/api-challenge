@@ -1,5 +1,6 @@
 package com.api.challenge.apichallenge.controller;
 
+import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.v1.ClienteResponse;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.service.ClienteService;
@@ -22,6 +23,11 @@ import static com.api.challenge.apichallenge.filter.ClienteFilter.*;
 public class ClienteController {
     @Autowired
     ClienteService clienteService;
+
+    @PutMapping("/v2/atualizarCSV")
+    public ResponseEntity<ClienteRequest> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException {
+        return ResponseEntity.status(HttpStatus.OK).body(clienteService.updateCSV(clienteRequest));
+    }
 
     @GetMapping("/v2/lerCSV")
     public ResponseEntity<Page<ClienteResponseV2>> lerCSV(

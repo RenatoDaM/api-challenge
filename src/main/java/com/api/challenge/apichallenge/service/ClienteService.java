@@ -1,6 +1,7 @@
 package com.api.challenge.apichallenge.service;
 
 import com.api.challenge.apichallenge.config.WebConfig;
+import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.util.csv.ClienteCSVHandler;
 import com.api.challenge.apichallenge.util.dateutil.AniversarioParaDNConversor;
 import com.api.challenge.apichallenge.response.v1.ClienteResponse;
@@ -35,8 +36,10 @@ public class ClienteService {
     @Autowired
     WebClient client;
 
-    public ClienteResponseV2 updateCSV(ClienteResponseV2 cliente) {
-        return null;
+    public ClienteRequest updateCSV(ClienteRequest cliente) throws IOException {
+        ClienteCSVHandler clienteCSVHandler = new ClienteCSVHandler(WebConfig.CSV_FILE_PATH);
+
+        return clienteCSVHandler.updateCSV(cliente);
     }
 
     public void deleteCSV() {

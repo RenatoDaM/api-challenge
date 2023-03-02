@@ -1,5 +1,6 @@
 package com.api.challenge.apichallenge.util.csv;
 
+import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
@@ -50,6 +51,40 @@ public class ClienteCSVHandler {
 
         clienteList.forEach(e -> System.out.println(e.getNome()));
         return clienteList;
+    }
+
+    public ClienteRequest updateCSV(ClienteRequest clienteResponse) throws IOException {
+        CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath + "listaDeClientes.csv"))
+                .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
+                .build();
+
+        List<ClienteRequest> clienteList = new CsvToBeanBuilder(csvReader)
+                .withType(ClienteRequest.class)
+                .withFilter(new ClienteCSVFilter())
+                .build()
+                .parse();
+
+        clienteList.set(clienteResponse.getId() -1, clienteResponse);
+
+        FileWriter fileWriter = new FileWriter(filePath + "listaDeClientes.csv");
+        CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
+        String[] header = {"Id", "Nome", "Idade", "Sexo", "DataNascimento"};
+        csvWriter.writeNext(header);
+
+        clienteList.forEach(cliente ->  {
+            String[] array = {Integer.toString(cliente.getId()), cliente.getNome(),
+                    Integer.toString(cliente.getIdade()), cliente.getSexo(), cliente.getDataNascimento()};
+            csvWriter.writeNext(array);
+        });
+
+        csvWriter.close();
+
+        List<ClienteResponseV2> clienteListUpdated = new CsvToBeanBuilder(csvReader)
+                .withType(ClienteResponseV2.class)
+                .withFilter(new ClienteCSVFilter())
+                .build()
+                .parse();
+        return clienteList.get(clienteResponse.getId() -1);
     }
 
 
