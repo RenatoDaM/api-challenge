@@ -7,6 +7,9 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.exceptions.CsvChainedException;
+import com.opencsv.exceptions.CsvException;
+import org.w3c.dom.ls.LSOutput;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -53,7 +56,7 @@ public class ClienteCSVHandler {
         return clienteList;
     }
 
-    public ClienteRequest updateCSV(ClienteRequest clienteResponse) throws IOException {
+    public ClienteRequest updateCSV(ClienteRequest clienteRequest) throws IOException {
         CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath + "listaDeClientes.csv"))
                 .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
                 .build();
@@ -64,7 +67,12 @@ public class ClienteCSVHandler {
                 .build()
                 .parse();
 
-        clienteList.set(clienteResponse.getId() -1, clienteResponse);
+        for (ClienteRequest cliente : clienteList) {
+            if (clienteRequest.getId() == clienteRequest.getId()) {
+                clienteList.set(clienteList.indexOf(cliente), clienteRequest);
+                break;
+            }
+        }
 
         FileWriter fileWriter = new FileWriter(filePath + "listaDeClientes.csv");
         CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
@@ -84,7 +92,15 @@ public class ClienteCSVHandler {
                 .withFilter(new ClienteCSVFilter())
                 .build()
                 .parse();
-        return clienteList.get(clienteResponse.getId() -1);
+
+        if (clienteListUpdated.contains(clienteRequest)) {
+            return clienteRequest;
+        }
+
+
+
+
+return null;
     }
 
 

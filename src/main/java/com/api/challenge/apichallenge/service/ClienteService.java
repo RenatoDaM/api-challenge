@@ -21,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Comparator;
@@ -42,8 +43,8 @@ public class ClienteService {
         return clienteCSVHandler.updateCSV(cliente);
     }
 
-    public void deleteCSV() {
-
+    public void deleteCSVFile() {
+        File file = new File(WebConfig.CSV_FILE_PATH + "listaDeClientes.csv");
     }
 
     public Page<ClienteResponseV2> readCSV(Pageable pageable) throws FileNotFoundException {

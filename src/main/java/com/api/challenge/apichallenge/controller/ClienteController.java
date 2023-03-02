@@ -1,5 +1,7 @@
 package com.api.challenge.apichallenge.controller;
 
+import com.api.challenge.apichallenge.filter.DataNascimentoFilter;
+import com.api.challenge.apichallenge.filter.IdadeFilter;
 import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.v1.ClienteResponse;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
@@ -24,6 +26,12 @@ public class ClienteController {
     @Autowired
     ClienteService clienteService;
 
+    @DeleteMapping("/v2/deleteCSVFile")
+    public ResponseEntity deleteCSVFile() {
+        clienteService.deleteCSVFile();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted");
+    }
+
     @PutMapping("/v2/atualizarCSV")
     public ResponseEntity<ClienteRequest> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.updateCSV(clienteRequest));
@@ -32,10 +40,11 @@ public class ClienteController {
     @GetMapping("/v2/lerCSV")
     public ResponseEntity<Page<ClienteResponseV2>> lerCSV(
             @PageableDefault(size = 10) Pageable pageable,
-            @RequestParam(value = "idade", required = false) Integer idade,
+            @RequestParam(value = "idade", required = false) String idade,
             @RequestParam(value = "sexo", required = false) String sexo,
             @RequestParam(value = "aniversario", required = false) String aniversario) throws  FileNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(filterClienteCSV(clienteService.readCSV(pageable), idade, sexo, aniversario));
+        Page<ClienteResponseV2> clienteResponseV2s = filterClienteCSV(clienteService.readCSV(pageable), idade, sexo, aniversario);
+        return ResponseEntity.status(HttpStatus.OK).body(clienteResponseV2s);
     }
 
     @PostMapping("/v2/criarCSV")
