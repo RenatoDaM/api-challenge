@@ -40,10 +40,14 @@ public class ClienteController {
     @GetMapping("/v2/lerCSV")
     public ResponseEntity<Page<ClienteResponseV2>> lerCSV(
             @PageableDefault(size = 10) Pageable pageable,
-            @RequestParam(value = "idade", required = false) String idade,
+            @RequestParam(value = "idade_min", required = false) Integer idadeMin,
+            @RequestParam(value = "idade_max", required = false) Integer idadeMax,
             @RequestParam(value = "sexo", required = false) String sexo,
-            @RequestParam(value = "aniversario", required = false) String aniversario) throws  FileNotFoundException {
-        Page<ClienteResponseV2> clienteResponseV2s = filterClienteCSV(clienteService.readCSV(pageable), idade, sexo, aniversario);
+            @RequestParam(value = "mes", required = false) String mes,
+            @RequestParam(value = "dia", required = false) String dia,
+            @RequestParam(value = "data_nasc_min", required = false) String dataNascMin,
+            @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) throws  FileNotFoundException {
+        Page<ClienteResponseV2> clienteResponseV2s = filterClienteCSV(clienteService.readCSV(pageable), idadeMin, idadeMax, sexo, dataNascMin, dataNascMax, mes, dia);
         return ResponseEntity.status(HttpStatus.OK).body(clienteResponseV2s);
     }
 
@@ -66,11 +70,15 @@ public class ClienteController {
     @RequestMapping("/v2/buscarClientes")
     public ResponseEntity<Flux<Page<ClienteResponseV2>>> getClientesV2(
             @PageableDefault(size = 10) Pageable pageable,
-            @RequestParam(value = "idade", required = false) Integer idade,
+            @RequestParam(value = "idade_min", required = false) Integer idadeMin,
+            @RequestParam(value = "idade_max", required = false) Integer idadeMax,
             @RequestParam(value = "sexo", required = false) String sexo,
-            @RequestParam(value = "aniversario", required = false) String aniversario) throws IOException {
+            @RequestParam(value = "mes", required = false) String mes,
+            @RequestParam(value = "dia", required = false) String dia,
+            @RequestParam(value = "data_nasc_min", required = false) String dataNascMin,
+            @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) throws IOException {
 
-        Flux<Page<ClienteResponseV2>> clientesFlux = filterClienteV2(clienteService.getClientesV2(pageable), idade, sexo, aniversario);
+        Flux<Page<ClienteResponseV2>> clientesFlux = filterClienteV2(clienteService.getClientesV2(pageable), idadeMin, idadeMax, sexo, dataNascMin, dataNascMax, mes, dia);
         return ResponseEntity.ok().body(clientesFlux);
     }
 }

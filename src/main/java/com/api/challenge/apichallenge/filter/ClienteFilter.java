@@ -14,58 +14,45 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class ClienteFilter {
-    public static Page<ClienteResponseV2> filterClienteCSV(Page<ClienteResponseV2> clientes, String idadeFilter, String sexo, String dataNascimentoFilter) {
+    public static Page<ClienteResponseV2> filterClienteCSV(Page<ClienteResponseV2> clientes, Integer idadeMin, Integer idadeMax, String sexo, String dataNascMin, String dataNascMax, String mes, String dia) {
 
-        if (sexo == null && idadeFilter == null &&  dataNascimentoFilter == null) {
+        if (sexo == null && idadeMin == null && idadeMax == null && dataNascMin == null && dataNascMax == null && mes == null && dia == null) {
             return clientes;
         }
 
-        List<ClienteResponseV2> newClienteListResponse = new ArrayList<>();
+        List<ClienteResponseV2> newClienteListResponse = clientes.toList();
 
-        if (idadeFilter != null) {
-            IdadeFilter idade = new IdadeFilter();
-            String[] idadeUnparsed = idadeFilter.split(":");
-            idade.setValor(Integer.valueOf(idadeUnparsed[0]));
-            idade.setComparador(IdadeFilter.Comparador.valueOf(idadeUnparsed[1]));
-            switch (idade.getComparador()) {
-                case MENOR:
-                    newClienteListResponse = clientes.stream().filter(cliente -> cliente.getIdade() < idade.valor).collect(Collectors.toList());
-                    break;
+        if (idadeMin != null) {
+            newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getIdade() >= idadeMin).collect(Collectors.toList());
+        }
 
-                case IGUAL:
-                    newClienteListResponse = clientes.stream().filter(cliente -> cliente.getIdade() == idade.valor).collect(Collectors.toList());
-                    break;
-
-                case MAIOR:
-                    newClienteListResponse = clientes.stream().filter(cliente -> cliente.getIdade() > idade.valor).collect(Collectors.toList());
-                    break;
-
-            }
+        if (idadeMax != null) {
+            newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getIdade() <= idadeMax).collect(Collectors.toList());
         }
 
         if (sexo != null) {
-            newClienteListResponse = clientes.stream().filter(cliente -> cliente.getSexo().equalsIgnoreCase(sexo)).collect(Collectors.toList());
+            newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getSexo().equalsIgnoreCase(sexo)).collect(Collectors.toList());
         }
 
-        if (dataNascimentoFilter != null) {
-            DataNascimentoFilter aniversario = new DataNascimentoFilter();
-            String[] dataUnparsed = dataNascimentoFilter.split(":");
-            aniversario.setDataNascimento(dataUnparsed[0]);
-            aniversario.setComparador(DataNascimentoFilter.Comparador.valueOf(dataUnparsed[1]));
-            switch (aniversario.getComparador()) {
-                case MENOR:
-                    newClienteListResponse = clientes.stream().filter(cliente -> aniversario.stringParaData(cliente.getDataNascimento()).isBefore(aniversario.stringParaData(aniversario.getDataNascimento()))).collect(Collectors.toList());
-                    break;
-
-                case IGUAL:
-                    newClienteListResponse = clientes.stream().filter(cliente -> cliente.getDataNascimento().equals(aniversario.getDataNascimento())).collect(Collectors.toList());
-                    break;
-
-                case MAIOR:
-                    newClienteListResponse = clientes.stream().filter(cliente -> aniversario.stringParaData(cliente.getDataNascimento()).isAfter(aniversario.stringParaData(aniversario.getDataNascimento()))).collect(Collectors.toList());
-                    break;
-            }
+        if (dataNascMin != null && dataNascMax == null) {
+            newClienteListResponse = newClienteListResponse.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isAfter(stringParaDataNascimento(dataNascMin))).collect(Collectors.toList());
         }
+
+        if (dataNascMax != null && dataNascMin == null) {
+            newClienteListResponse = newClienteListResponse.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isBefore(stringParaDataNascimento(dataNascMax))).collect(Collectors.toList());
+        }
+
+        if (mes != null) {
+            newClienteListResponse = newClienteListResponse.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getMonthValue() == (Integer.valueOf(mes))).collect(Collectors.toList());
+            System.out.println("mes" + mes);
+        }
+
+        if (dia != null) {
+            newClienteListResponse = newClienteListResponse.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getDayOfMonth() == (Integer.valueOf(dia))).collect(Collectors.toList());
+            System.out.println("dia" + dia);
+        }
+
+
         Page<ClienteResponseV2> clientePage = new PageImpl<>(newClienteListResponse);
 
         return  clientePage;
@@ -93,27 +80,54 @@ public class ClienteFilter {
         return  clientePage;
     }
 
-    public static Flux<Page<ClienteResponseV2>> filterClienteV2(Flux<Page<ClienteResponseV2>> clientesFlux, Integer idade, String sexo, String aniversario) {
+    public static Flux<Page<ClienteResponseV2>> filterClienteV2(Flux<Page<ClienteResponseV2>> clientesFlux, Integer idadeMin, Integer idadeMax, String sexo, String dataNascMin, String dataNascMax, String mes, String dia) {
         return clientesFlux.flatMap(clientes -> {
-            if (sexo == null && idade == null && aniversario == null) {
+            if (sexo == null && idadeMin == null && idadeMax == null && dataNascMin == null && dataNascMax == null && mes == null && dia == null) {
                 return Flux.just(clientes);
             }
-            List<ClienteResponseV2> newClienteListResponse = new ArrayList<>();
 
-            if (idade != null) {
-                newClienteListResponse = clientes.stream().filter(cliente -> cliente.getIdade() == idade).collect(Collectors.toList());
+            List<ClienteResponseV2> newClienteListResponse = clientes.toList();
+
+            if (idadeMin != null) {
+                newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getIdade() >= idadeMin).collect(Collectors.toList());
             }
+
+            if (idadeMax != null) {
+                newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getIdade() <= idadeMax).collect(Collectors.toList());
+            }
+
             if (sexo != null) {
-                System.out.println(clientes.getContent().get(0).getSexo());;
-
-                newClienteListResponse = clientes.stream().filter(cliente -> cliente.getSexo().equalsIgnoreCase(sexo)).collect(Collectors.toList());
+                newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getSexo().equalsIgnoreCase(sexo)).collect(Collectors.toList());
             }
-            if (aniversario != null) {
-                newClienteListResponse = clientes.stream().filter(cliente -> cliente.getDataNascimento().equals(aniversario)).collect(Collectors.toList());
+
+            if (dataNascMin != null && dataNascMax == null) {
+                newClienteListResponse = newClienteListResponse.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isAfter(stringParaDataNascimento(dataNascMin))).collect(Collectors.toList());
+            }
+
+            if (dataNascMax != null && dataNascMin == null) {
+                newClienteListResponse = newClienteListResponse.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isBefore(stringParaDataNascimento(dataNascMax))).collect(Collectors.toList());
+            }
+
+            if (mes != null) {
+                newClienteListResponse = newClienteListResponse.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getMonthValue() == (Integer.valueOf(mes))).collect(Collectors.toList());
+                System.out.println("mes" + mes);
+            }
+
+            if (dia != null) {
+                newClienteListResponse = newClienteListResponse.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getDayOfMonth() == (Integer.valueOf(dia))).collect(Collectors.toList());
+                System.out.println("dia" + dia);
             }
 
             Page<ClienteResponseV2> clientePage = new PageImpl<>(newClienteListResponse);
             return Flux.just(clientePage);
         });
     }
+
+    public static LocalDate stringParaDataNascimento(String string) {
+        Locale LOCALE_BRAZIL = new Locale("pt", "BR");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", LOCALE_BRAZIL);
+        LocalDate data = LocalDate.parse(string, formatter);
+        return data;
+    }
+
 }
