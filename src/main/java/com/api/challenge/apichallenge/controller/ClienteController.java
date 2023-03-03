@@ -26,9 +26,9 @@ public class ClienteController {
     @Autowired
     ClienteService clienteService;
 
-    @DeleteMapping("/v2/deleteCSVFile")
-    public ResponseEntity deleteCSVFile() {
-        clienteService.deleteCSVFile();
+    @DeleteMapping("/v2/deletarCSVLine/{id}")
+    public ResponseEntity deleteCSVFile(@PathVariable Integer id) throws IOException {
+        clienteService.deleteCSVFile(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted");
     }
 

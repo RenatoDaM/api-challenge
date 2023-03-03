@@ -43,8 +43,9 @@ public class ClienteService {
         return clienteCSVHandler.updateCSV(cliente);
     }
 
-    public void deleteCSVFile() {
-        File file = new File(WebConfig.CSV_FILE_PATH + "listaDeClientes.csv");
+    public void deleteCSVFile(Integer id) throws IOException {
+        ClienteCSVHandler clienteCSVHandler = new ClienteCSVHandler(WebConfig.CSV_FILE_PATH);
+        clienteCSVHandler.deleteCSVLine(id);
     }
 
     public Page<ClienteResponseV2> readCSV(Pageable pageable) throws FileNotFoundException {

@@ -7,14 +7,11 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBeanBuilder;
-import com.opencsv.exceptions.CsvChainedException;
-import com.opencsv.exceptions.CsvException;
-import org.w3c.dom.ls.LSOutput;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClienteCSVHandler {
@@ -52,7 +49,6 @@ public class ClienteCSVHandler {
                 .build()
                 .parse();
 
-        clienteList.forEach(e -> System.out.println(e.getNome()));
         return clienteList;
     }
 
@@ -87,21 +83,31 @@ public class ClienteCSVHandler {
 
         csvWriter.close();
 
-        List<ClienteResponseV2> clienteListUpdated = new CsvToBeanBuilder(csvReader)
-                .withType(ClienteResponseV2.class)
-                .withFilter(new ClienteCSVFilter())
-                .build()
-                .parse();
-
-        if (clienteListUpdated.contains(clienteRequest)) {
-            return clienteRequest;
-        }
-
-
-
-
-return null;
+        return clienteRequest;
     }
 
+    public void deleteCSVLine(Integer id) throws IOException {
+        List<ClienteResponseV2> clienteList = read();
+        List<ClienteResponseV2> novaLista = new ArrayList<>();
 
+        for (ClienteResponseV2 cliente : clienteList) {
+            if (!cliente.getId().equals(id)) {
+                novaLista.add(cliente);
+            } else {
+                System.out.println("ACHAMOOO");
+            }
+        }
+        FileWriter fileWriter = new FileWriter(filePath + "listaDeClientes.csv");
+        CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
+        String[] header = {"Id", "Nome", "Idade", "Sexo", "DataNascimento"};
+        csvWriter.writeNext(header);
+
+        novaLista.forEach(cliente ->  {
+            String[] array = {Integer.toString(cliente.getId()), cliente.getNome(),
+                    Integer.toString(cliente.getIdade()), cliente.getSexo(), cliente.getDataNascimento()};
+            csvWriter.writeNext(array);
+        });
+
+        csvWriter.close();
+    }
 }

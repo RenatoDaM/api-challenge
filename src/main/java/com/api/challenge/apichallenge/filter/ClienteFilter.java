@@ -129,5 +129,4 @@ public class ClienteFilter {
         LocalDate data = LocalDate.parse(string, formatter);
         return data;
     }
-
 }
