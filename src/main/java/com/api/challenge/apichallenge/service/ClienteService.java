@@ -126,8 +126,6 @@ public class ClienteService {
                                 Page<ClienteResponseV2> clienteResponseV2Page = paginarListaV2(clientesPaginados, pageable);
                                 MetaData metaData = new MetaData(clientesPaginados.size());
                                 ClienteWrapperV2 clienteWrapperV2 = new ClienteWrapperV2(clienteResponseV2Page, metaData);
-                                clienteWrapperV2.setMetaData(new MetaData(clientes.getClientesResponseV2List().size()));
-
                                 return clienteWrapperV2;
                             });
                 });
