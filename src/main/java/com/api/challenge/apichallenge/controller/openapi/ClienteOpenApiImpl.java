@@ -107,10 +107,10 @@ public interface ClienteOpenApiImpl {
 
     @Operation(summary = "Atualiza um cliente dentro do CSV. Lê o objeto no body do JSON e atualiza o objeto com o mesmo ID.")
     @ApiResponses(value = {
-            @ApiResponse(description = "Cliente atualizado", responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteResponseV2.class))),
+            @ApiResponse(description = "Cliente atualizado", responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteRequest.class))),
             @ApiResponse(description = "Data de nascimento inválida. Exemplo de formato correto: 01-01-1997.", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<ClienteResponseV2> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth, MissingClienteParametersException;
+    public ResponseEntity<ClienteRequest> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth, MissingClienteParametersException;
 
     @Operation(summary = "Deleta o cliente dentro do arquivo CSV que possui o ID fornecido.")
     @ApiResponses(value = {

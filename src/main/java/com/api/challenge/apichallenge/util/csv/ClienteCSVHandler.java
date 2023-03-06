@@ -95,7 +95,7 @@ public class ClienteCSVHandler {
                 .parse();
     }
 
-    public ClienteResponseV2 updateCSV(ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth {
+    public ClienteRequest updateCSV(ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth {
         CSVReader csvReader = new CSVReaderBuilder(new FileReader(FILE_PATH + CSV_FILE_NAME))
                 .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
                 .build();
@@ -109,26 +109,19 @@ public class ClienteCSVHandler {
         String regex = "\\d\\d-\\d\\d-\\d\\d\\d\\d";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(clienteRequest.getDataNascimento());
-        ClienteResponseV2 clienteResponseV2 = new ClienteResponseV2();
         if (matcher.find()) {
             boolean clienteFound = false;
             for (ClienteRequest cliente : clienteList) {
                 if (clienteRequest.getId().equals(cliente.getId())) {
                     int index = clienteList.indexOf(cliente);
                     clienteList.set(index, clienteRequest);
-                    clienteResponseV2.setId(index);
                     clienteFound = true;
                     break;
                 }
             }
             if (!clienteFound) throw new ClienteInCSVNotFoundException("OPERAÇÃO UPDATE FALHOU. Não foi possível achar um usuário com o ID: " + clienteRequest.getId());
             reescreverCSVRequest(clienteList);
-            clienteResponseV2.setId(clienteRequest.getId()+1);
-            clienteResponseV2.setDataNascimento(clienteRequest.getDataNascimento());
-            clienteResponseV2.setIdade(clienteRequest.getIdade());
-            clienteResponseV2.setSexo(clienteRequest.getSexo());
-            clienteResponseV2.setNome(clienteRequest.getNome());
-            return clienteResponseV2;
+            return clienteRequest;
         } else {
             throw new InvalidDateOfBirth("Data de nascimento inválida. Exemplo de formato correto: 01-01-1997.");
         }
