@@ -15,7 +15,7 @@ public class ClienteResponse {
     }
 
     public String getNome() {
-        return nome;
+        return this.nome;
     }
 
     public void setNome(String nome) {

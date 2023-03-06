@@ -1,13 +1,16 @@
-package com.api.challenge.apichallenge.response.v2;
+package com.api.challenge.apichallenge.dto.v2;
 
+import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
+import com.api.challenge.apichallenge.response.MetaData;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class ClienteResponseWrapperV2 {
-
+public class ClienteResponseWrapperDTOV2 {
+    MetaData metaData;
     @JsonProperty("clientes")
     List<ClienteResponseV2> clienteResponses;
+
 
     public List<ClienteResponseV2> getClientesResponseV2List() {
         return clienteResponses;
