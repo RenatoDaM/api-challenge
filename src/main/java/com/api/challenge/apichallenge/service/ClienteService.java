@@ -7,7 +7,6 @@ import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import com.api.challenge.apichallenge.pagination.CustomPageImpl;
 import com.api.challenge.apichallenge.pagination.CustomPageable;
 import com.api.challenge.apichallenge.request.ClienteRequest;
-import com.api.challenge.apichallenge.response.NewClienteWrapper;
 import com.api.challenge.apichallenge.response.MetaData;
 import com.api.challenge.apichallenge.response.v1.ClienteResponse;
 import com.api.challenge.apichallenge.util.csv.ClienteCSVHandler;
@@ -15,7 +14,6 @@ import com.api.challenge.apichallenge.util.dateutil.AniversarioParaDNConversor;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.util.jsonparser.ClienteJsonParser;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,10 +78,10 @@ public class ClienteService {
                 .map(ClienteJsonParser::mapearParaListaDeClientes)
                 .flatMap(clientes -> {
 
-                    Flux<ClienteResponseV2> flux = Flux.fromIterable(clientes.getClienteResponses())
+                    Flux<ClienteResponseV2> flux = Flux.fromIterable(clientes.getClientesResponseV2List())
                             .map(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento)
                             .sort(Comparator.comparing(ClienteResponseV2::getNome))
-                            .zipWith(Flux.range(1, clientes.getClienteResponses().size()),
+                            .zipWith(Flux.range(1, clientes.getClientesResponseV2List().size()),
                                     (clienteResponse, id) -> {
                                         clienteResponse.setId(id);
                                         return clienteResponse;
@@ -136,11 +134,11 @@ public class ClienteService {
                 .map(ClienteJsonParser::extrairNodeClientes)
                 .map(ClienteJsonParser::mapearParaListaDeClientes)
                 .flatMap(clientes -> {
-                    System.out.println(clientes.getClienteResponses());
-                    Flux<ClienteResponseV2> flux = Flux.fromIterable(clientes.getClienteResponses())
+                    System.out.println(clientes.getClientesResponseV2List());
+                    Flux<ClienteResponseV2> flux = Flux.fromIterable(clientes.getClientesResponseV2List())
                             .map(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento)
                             .sort(Comparator.comparing(ClienteResponseV2::getNome))
-                            .zipWith(Flux.range(1, clientes.getClienteResponses().size()),
+                            .zipWith(Flux.range(1, clientes.getClientesResponseV2List().size()),
                                     (clienteResponse, id) -> {
                                         clienteResponse.setId(id);
                                         return clienteResponse;
@@ -152,7 +150,7 @@ public class ClienteService {
                                 Page<ClienteResponseV2> clienteResponseV2Page = paginarListaV2(clientesPaginados, pageable);
                                 MetaData metaData = new MetaData(clientesPaginados.size());
                                 ClienteWrapperV2 clienteWrapperV2 = new ClienteWrapperV2(clienteResponseV2Page, metaData);
-                                clienteWrapperV2.setMetaData(new MetaData(clientes.getClienteResponses().size()));
+                                clienteWrapperV2.setMetaData(new MetaData(clientes.getClientesResponseV2List().size()));
 
                                 return clienteWrapperV2;
                             });

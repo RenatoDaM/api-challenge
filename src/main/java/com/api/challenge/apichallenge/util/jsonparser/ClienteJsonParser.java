@@ -1,6 +1,6 @@
 package com.api.challenge.apichallenge.util.jsonparser;
 
-import com.api.challenge.apichallenge.response.NewClienteWrapper;
+import com.api.challenge.apichallenge.dto.v2.ClienteResponseWrapperDTOV2;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,10 +24,10 @@ public class ClienteJsonParser {
     }
 
 
-    public static NewClienteWrapper mapearParaListaDeClientes(JsonNode clientesNode) {
+    public static ClienteResponseWrapperDTOV2 mapearParaListaDeClientes(JsonNode clientesNode) {
         try {
             System.out.println(clientesNode);
-            return objectMapper.treeToValue(clientesNode, NewClienteWrapper.class);
+            return objectMapper.treeToValue(clientesNode, ClienteResponseWrapperDTOV2.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
