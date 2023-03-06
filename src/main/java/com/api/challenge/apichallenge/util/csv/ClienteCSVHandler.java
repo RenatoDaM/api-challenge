@@ -8,8 +8,6 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBeanBuilder;
-import org.springframework.context.annotation.Bean;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -18,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClienteCSVHandler {
-
-    public Integer lastIndex;
     private final String FILE_PATH;
     private static final String CSV_FILE_NAME = "listaDeClientes.csv";
     private static final String[] CSV_HEADERS = {"Id", "Nome", "Idade", "Sexo", "DataNascimento"};
@@ -32,10 +28,20 @@ public class ClienteCSVHandler {
     public ClienteRequest writeNewLine(ClienteRequest pessoa) throws IOException {
         FileWriter fileWriter = new FileWriter(FILE_PATH + CSV_FILE_NAME, true);
         CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
-        String[] linha = {pessoa.getNome(),
+        List<ClienteResponseV2> clientesList = read();
+        ClienteResponseV2 clienteResponseV2 = clientesList.get(clientesList.size()-1);
+        // Eu tinha implementado uma lógica antes que essa classe era um Bean, aonde inicializava
+        // já com uma variável lastIndex que recebia o lastIndex no momento da inicialização (lia o
+        // arquivo ao inicializar a aplicação), e esse atributo
+        // era usado para as lógicas, com o objetivo de não ter que ficar lendo o arquivo toda hora.
+        // Porém, pensando pelo lado que alguém pode abrir o arquivo e apagar, achei mais safe ler sim
+        // várias vezes. Porém, dependendo da regra de negócio seria sim possível, já que ID's (dependendo
+        // da regra) são apenas para identificação, nao possuem um valor além desse.
+        String[] linha = {Integer.toString(clienteResponseV2.getId()+1), pessoa.getNome(),
                 Integer.toString(pessoa.getIdade()), pessoa.getSexo(), pessoa.getDataNascimento()};
         csvWriter.writeNext(linha);
         csvWriter.close();
+        pessoa.setId(clienteResponseV2.getId()+1);
         return pessoa;
     }
 

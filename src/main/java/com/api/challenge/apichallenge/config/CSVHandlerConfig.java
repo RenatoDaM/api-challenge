@@ -12,10 +12,8 @@ public class CSVHandlerConfig {
     public static final String CSV_DIRECTORY_PATH = "D:\\FACULDADE\\";
 
     @Bean
-    public ClienteCSVHandler clienteCSVHandler() throws FileNotFoundException {
+    public ClienteCSVHandler clienteCSVHandler() {
         ClienteCSVHandler clienteCSVHandler = new ClienteCSVHandler(CSV_DIRECTORY_PATH);
-        ClienteResponseV2 clienteResponseV2 = clienteCSVHandler.read().get(clienteCSVHandler.read().size() - 2);
-        clienteCSVHandler.lastIndex = clienteResponseV2.getId();
         return clienteCSVHandler;
     }
 }
