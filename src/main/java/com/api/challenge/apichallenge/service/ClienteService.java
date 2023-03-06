@@ -2,6 +2,7 @@ package com.api.challenge.apichallenge.service;
 
 import com.api.challenge.apichallenge.config.HeadersDefault;
 import com.api.challenge.apichallenge.dto.v1.ClienteResponseWrapperDTO;
+import com.api.challenge.apichallenge.exception.ClienteInCSVNotFound;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import com.api.challenge.apichallenge.pagination.CustomPageImpl;
@@ -28,15 +29,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-// NAO TA PAGINADO O GET V2
-// TEM Q ARRUMAR O FILTRO
-// NAO DEU PRA USAR DAQUELA FORMA O JSONPARSER
+
 @Service
 public class ClienteService {
     @Autowired
@@ -58,7 +56,7 @@ public class ClienteService {
         return clienteCSVHandler.updateCSV(cliente);
     }
 
-    public void deleteCSVFile(Integer id) throws IOException {
+    public void deleteCSVFile(Integer id) throws IOException, ClienteInCSVNotFound {
         clienteCSVHandler.deleteCSVLine(id);
     }
 

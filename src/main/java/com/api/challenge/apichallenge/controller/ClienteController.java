@@ -1,5 +1,6 @@
 package com.api.challenge.apichallenge.controller;
 
+import com.api.challenge.apichallenge.exception.ClienteInCSVNotFound;
 import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
@@ -14,10 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import static com.api.challenge.apichallenge.search.ClienteFilter.*;
 
 @RestController
@@ -82,7 +81,7 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @DeleteMapping("/v2/deletarCSVLine/{id}")
-    public ResponseEntity<Response> deleteCSVFile(@PathVariable Integer id) throws IOException {
+    public ResponseEntity<Response> deleteCSVFile(@PathVariable Integer id) throws IOException, ClienteInCSVNotFound {
         clienteService.deleteCSVFile(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new Response(204, "Deleted successfully"));
     }

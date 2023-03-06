@@ -8,9 +8,7 @@ import com.api.challenge.apichallenge.response.v1.ClienteResponse;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.response.MetaData;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import reactor.core.publisher.Flux;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;

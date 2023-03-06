@@ -1,5 +1,6 @@
 package com.api.challenge.apichallenge.util.csv;
 
+import com.api.challenge.apichallenge.exception.ClienteInCSVNotFound;
 import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.opencsv.CSVParserBuilder;
@@ -89,15 +90,16 @@ public class ClienteCSVHandler {
         return clienteRequest;
     }
 
-    public void deleteCSVLine(Integer id) throws IOException {
+    public void deleteCSVLine(Integer id) throws IOException, ClienteInCSVNotFound {
         List<ClienteResponseV2> clienteList = read();
         List<ClienteResponseV2> novaLista = new ArrayList<>();
 
         for (ClienteResponseV2 cliente : clienteList) {
+            if (cliente.getId() == null) {
+                throw new ClienteInCSVNotFound("OPERAÇÃO DELETAR FALHOU. Não foi encontrado um cliente com o ID: " + id);
+            }
             if (!cliente.getId().equals(id)) {
                 novaLista.add(cliente);
-            } else {
-                System.out.println("ACHAMOOO");
             }
         }
         reescreverCSV(novaLista);
