@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 public class ClienteCSVHandler {
     private final String FILE_PATH;
-    private static final String CSV_FILE_NAME = "listaDeClientes.csv";
+    public static final String CSV_FILE_NAME = "listaDeClientes.csv";
     private static final String[] CSV_HEADERS = {"Id", "Nome", "Idade", "Sexo", "DataNascimento"};
 
     public ClienteCSVHandler(String FILE_PATH) {

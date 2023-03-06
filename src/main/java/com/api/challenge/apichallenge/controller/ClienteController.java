@@ -1,5 +1,6 @@
 package com.api.challenge.apichallenge.controller;
 
+import com.api.challenge.apichallenge.config.CSVHandlerConfig;
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
 import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
 import com.api.challenge.apichallenge.response.Response;
@@ -8,8 +9,8 @@ import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import com.api.challenge.apichallenge.pagination.CustomPageable;
 import com.api.challenge.apichallenge.controller.openapi.ClienteOpenApiImpl;
 import com.api.challenge.apichallenge.request.ClienteRequest;
-import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.service.ClienteService;
+import com.api.challenge.apichallenge.util.csv.ClienteCSVHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -50,8 +51,10 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @PostMapping("/v2/criarCSV")
-    public ResponseEntity<Flux<ClienteResponseV2>> postarCSV() {
-        return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.postCSV());
+    public ResponseEntity<Response> postarCSV() {
+        Response response = new Response(201, "Arquivo CSV criado no diretório: " + CSVHandlerConfig.CSV_DIRECTORY_PATH + ClienteCSVHandler.CSV_FILE_NAME);
+        clienteService.postCSV();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // NECESSÁRIO USO DE REQUEST POR CONTA DA FORMA QUE IMPLEMENTEI O CONVERSOR DE ANIVERSÁRIO PARA DATA DE
     // NASCIMENTO. O setDataNascimento usa a propriedade json aniversario, ja o get usa o próprio atributo
