@@ -41,7 +41,7 @@ public class ClienteService {
     @Autowired
     ClienteDAO clienteDAO;
 
-    public ClienteResponseV2 escreverNovaLinhaCSV(ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
+    public ClienteRequest escreverNovaLinhaCSV(ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
         if (clienteRequest.getDataNascimento() == null || clienteRequest.getIdade() == null || clienteRequest.getSexo() == null || clienteRequest.getNome() == null) {
             throw new MissingClienteParametersException("Parâmetro(s) obrigatório(s) não preenchido(s). Favor preencher corretamente.");
         }

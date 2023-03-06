@@ -6,7 +6,6 @@ import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
 import com.api.challenge.apichallenge.exception.MissingClienteParametersException;
 import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
-import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import com.api.challenge.apichallenge.pagination.CustomPageable;
 import com.api.challenge.apichallenge.controller.openapi.ClienteOpenApiImpl;
@@ -61,8 +60,10 @@ public class ClienteController implements ClienteOpenApiImpl {
     // NECESSÁRIO USO DE REQUEST POR CONTA DA FORMA QUE IMPLEMENTEI O CONVERSOR DE ANIVERSÁRIO PARA DATA DE
     // NASCIMENTO. O setDataNascimento usa a propriedade json aniversario, ja o get usa o próprio atributo
     // dataNascimento.
+
+    // Re
     @PostMapping("/v2/adicionarPessoaCSV")
-    public ResponseEntity<ClienteResponseV2> adicionarPessoaCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
+    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.escreverNovaLinhaCSV(clienteRequest));
     }
 

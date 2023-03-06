@@ -2,14 +2,9 @@ package com.api.challenge.apichallenge.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.opencsv.bean.CsvBindByPosition;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 public class ClienteRequest {
-    @Hidden
     @CsvBindByPosition(position = 0)
     @Schema(nullable = true, example = "null", description = "Ao criar você não insere o parâmetro e nem valor ID. Apenas deixei visível esse parâmetro pois após criar um novo cliente, irá retornar o valor do ID que ficou salvo no arquivo CSV.")
     Integer id;

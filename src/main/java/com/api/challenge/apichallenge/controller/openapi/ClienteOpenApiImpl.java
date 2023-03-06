@@ -76,10 +76,10 @@ public interface ClienteOpenApiImpl {
 
     @Operation(summary = "Adiciona um cliente ao arquivo CSV no formato padrão separado por ;")
     @ApiResponses(value = {
-            @ApiResponse(description = "Adiciona um cliente ao arquivo CSV", responseCode = "201", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteResponseV2.class))),
+            @ApiResponse(description = "Adiciona um cliente ao arquivo CSV", responseCode = "201", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteRequest.class))),
             @ApiResponse(description = "Data de nascimento inválida. Exemplo de formato correto: 01-01-1997.", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<ClienteResponseV2> adicionarPessoaCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException;
+    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException;
 
     @Operation(summary = "Retorna uma lista de clientes filtrados com base em vários parâmetros de consulta a partir do arquivo CSV",
             description = "Este endpoint retorna uma lista de clientes filtrados a partir do arquivo CSV com base nos parâmetros de consulta fornecidos. Os parâmetros de consulta são opcionais e podem ser usados em qualquer combinação.")

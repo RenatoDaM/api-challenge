@@ -30,7 +30,7 @@ public class ClienteCSVHandler {
     }
 
 
-    public ClienteResponseV2 writeNewLine(ClienteRequest pessoa) throws IOException, InvalidDateOfBirth {
+    public ClienteRequest writeNewLine(ClienteRequest pessoa) throws IOException, InvalidDateOfBirth {
         FileWriter fileWriter = new FileWriter(FILE_PATH + CSV_FILE_NAME, true);
         CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
         List<ClienteResponseV2> clientesList = read();
@@ -54,13 +54,8 @@ public class ClienteCSVHandler {
             csvWriter.writeNext(linha);
             csvWriter.close();
             pessoa.setId(clienteResponseV2.getId()+1);
-            clienteResponseV2.setId(clienteResponseV2.getId()+1);
-            clienteResponseV2.setDataNascimento(pessoa.getDataNascimento());
-            clienteResponseV2.setIdade(pessoa.getIdade());
-            clienteResponseV2.setSexo(pessoa.getSexo());
-            clienteResponseV2.setNome(pessoa.getNome());
 
-            return clienteResponseV2;
+            return pessoa;
         } else {
             throw new InvalidDateOfBirth("Data de nascimento inválida. Exemplo de formato correto: 01-01-1997.");
         }
