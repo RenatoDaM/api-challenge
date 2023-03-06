@@ -4,16 +4,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public class ClienteInCSVNotFound extends Exception {
-    public ClienteInCSVNotFound() {
+public class ClienteInCSVNotFoundException extends Exception {
+    public ClienteInCSVNotFoundException() {
         super();
     }
 
-    public ClienteInCSVNotFound (String msg) {
+    public ClienteInCSVNotFoundException(String msg) {
         super(msg);
     }
 
-    public ClienteInCSVNotFound (String msg, Throwable cause) {
+    public ClienteInCSVNotFoundException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

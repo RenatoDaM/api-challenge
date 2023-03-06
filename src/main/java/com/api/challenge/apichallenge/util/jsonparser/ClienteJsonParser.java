@@ -24,7 +24,7 @@ public class ClienteJsonParser {
     }
 
 
-    public static ClienteResponseWrapperDTOV2 mapearParaListaDeClientes(JsonNode clientesNode) {
+    public static ClienteResponseWrapperDTOV2 mapearParaClientesWrapperDTO(JsonNode clientesNode) {
         try {
             System.out.println(clientesNode);
             return objectMapper.treeToValue(clientesNode, ClienteResponseWrapperDTOV2.class);

@@ -1,6 +1,6 @@
 package com.api.challenge.apichallenge.controller;
 
-import com.api.challenge.apichallenge.exception.ClienteInCSVNotFound;
+import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
 import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
@@ -76,12 +76,12 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @PutMapping("/v2/atualizarCSV")
-    public ResponseEntity<ClienteRequest> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException {
+    public ResponseEntity<ClienteRequest> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.updateCSV(clienteRequest));
     }
 
     @DeleteMapping("/v2/deletarCSVLine/{id}")
-    public ResponseEntity<Response> deleteCSVFile(@PathVariable Integer id) throws IOException, ClienteInCSVNotFound {
+    public ResponseEntity<Response> deleteCSVFile(@PathVariable Integer id) throws IOException, ClienteInCSVNotFoundException {
         clienteService.deleteCSVFile(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new Response(204, "Deleted successfully"));
     }

@@ -1,6 +1,6 @@
 package com.api.challenge.apichallenge.util.csv;
 
-import com.api.challenge.apichallenge.exception.ClienteInCSVNotFound;
+import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
 import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.opencsv.CSVParserBuilder;
@@ -30,8 +30,8 @@ public class ClienteCSVHandler {
         CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
         List<ClienteResponseV2> clientesList = read();
         ClienteResponseV2 clienteResponseV2 = clientesList.get(clientesList.size()-1);
-        // Eu tinha implementado uma lógica antes que essa classe era um Bean, aonde inicializava
-        // já com uma variável lastIndex que recebia o lastIndex no momento da inicialização (lia o
+        // Eu tinha implementado uma lógica antes aonde essa classe era um Bean, aonde inicializava
+        // já com uma variável lastIndex que recebia o ultimo ID da lista no momento da inicialização (lia o
         // arquivo ao inicializar a aplicação), e esse atributo
         // era usado para as lógicas, com o objetivo de não ter que ficar lendo o arquivo toda hora.
         // Porém, pensando pelo lado que alguém pode abrir o arquivo e apagar, achei mais safe ler sim
@@ -73,7 +73,7 @@ public class ClienteCSVHandler {
                 .parse();
     }
 
-    public ClienteRequest updateCSV(ClienteRequest clienteRequest) throws IOException {
+    public ClienteRequest updateCSV(ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException {
         CSVReader csvReader = new CSVReaderBuilder(new FileReader(FILE_PATH + CSV_FILE_NAME))
                 .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
                 .build();
@@ -83,20 +83,21 @@ public class ClienteCSVHandler {
                 .withFilter(new ClienteCSVFilter())
                 .build()
                 .parse();
-
+        boolean clienteFound = false;
         for (ClienteRequest cliente : clienteList) {
             if (clienteRequest.getId().equals(cliente.getId())) {
                 int index = clienteList.indexOf(cliente);
                 clienteList.set(index, clienteRequest);
+                clienteFound = true;
                 break;
             }
         }
-
+        if (!clienteFound) throw new ClienteInCSVNotFoundException("OPERAÇÃO UPDATE FALHOU. Não foi possível achar um usuário com o ID: " + clienteRequest.getId());
         reescreverCSVRequest(clienteList);
         return clienteRequest;
     }
 
-    public void deleteCSVLine(Integer id) throws IOException, ClienteInCSVNotFound {
+    public void deleteCSVLine(Integer id) throws IOException, ClienteInCSVNotFoundException {
         List<ClienteResponseV2> clienteList = read();
         List<ClienteResponseV2> novaLista = new ArrayList<>();
         boolean idEncontrado = false;
@@ -110,7 +111,7 @@ public class ClienteCSVHandler {
             System.out.println(cliente.getNome());
         }
 
-        if (!idEncontrado) throw new ClienteInCSVNotFound("OPERAÇÃO DELETAR FALHOU. Não foi encontrado um cliente com o ID: " + id);
+        if (!idEncontrado) throw new ClienteInCSVNotFoundException("OPERAÇÃO DELETAR FALHOU. Não foi encontrado um cliente com o ID: " + id);
 
         reescreverCSV(novaLista);
     }

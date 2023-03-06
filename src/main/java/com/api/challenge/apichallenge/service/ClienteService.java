@@ -1,8 +1,10 @@
 package com.api.challenge.apichallenge.service;
 
 import com.api.challenge.apichallenge.config.HeadersDefault;
+import com.api.challenge.apichallenge.dao.ClienteDAO;
 import com.api.challenge.apichallenge.dto.v1.ClienteResponseWrapperDTO;
-import com.api.challenge.apichallenge.exception.ClienteInCSVNotFound;
+import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
+import com.api.challenge.apichallenge.exception.InvalidURIException;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import com.api.challenge.apichallenge.pagination.CustomPageImpl;
@@ -18,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpEntity;
@@ -38,8 +39,6 @@ import java.util.stream.Collectors;
 @Service
 public class ClienteService {
     @Autowired
-    ModelMapper mapper;
-    @Autowired
     ObjectMapper objectMapper;
     @Autowired
     WebClient client;
@@ -47,16 +46,18 @@ public class ClienteService {
     ClienteCSVHandler clienteCSVHandler;
     @Autowired
     ClienteJsonParser clienteJsonParser;
+    @Autowired
+    ClienteDAO clienteDAO;
 
     public ClienteRequest escreverNovaLinhaCSV(ClienteRequest clienteRequest) throws IOException {
         return clienteCSVHandler.writeNewLine(clienteRequest);
     }
 
-    public ClienteRequest updateCSV(ClienteRequest cliente) throws IOException {
+    public ClienteRequest updateCSV(ClienteRequest cliente) throws IOException, ClienteInCSVNotFoundException {
         return clienteCSVHandler.updateCSV(cliente);
     }
 
-    public void deleteCSVFile(Integer id) throws IOException, ClienteInCSVNotFound {
+    public void deleteCSVFile(Integer id) throws IOException, ClienteInCSVNotFoundException {
         clienteCSVHandler.deleteCSVLine(id);
     }
 
@@ -68,51 +69,34 @@ public class ClienteService {
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
     public Flux<ClienteResponseV2> postCSV() {
-        return client.get()
-                .uri("/b/63fa39efc0e7653a057e6fa7")
-                .retrieve()
-                .bodyToFlux(String.class)
+        return clienteDAO.postCSV()
                 .map(ClienteJsonParser::pegarJsonNode)
                 .map(ClienteJsonParser::extrairNodeClientes)
-                .map(ClienteJsonParser::mapearParaListaDeClientes)
-                .flatMap(clientes -> {
-
-                    Flux<ClienteResponseV2> flux = Flux.fromIterable(clientes.getClientesResponseV2List())
-                            .map(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento)
-                            .sort(Comparator.comparing(ClienteResponseV2::getNome))
-                            .zipWith(Flux.range(1, clientes.getClientesResponseV2List().size()),
-                                    (clienteResponse, id) -> {
-                                        clienteResponse.setId(id);
-                                        return clienteResponse;
-                                    }).doOnNext(client -> {
-                                try {
-                                    clienteCSVHandler.consumesApiToCSV(client);
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            });
-                    return flux;
-                });
-                // É possível que eu não retorne um Response, pois assim poderia usar dos Query Params.
-                // Também é possível q no body eu devolva um CSV dependendo da regra de negócio.
+                .map(ClienteJsonParser::mapearParaClientesWrapperDTO)
+                .flatMap(clientes -> Flux.fromIterable(clientes.getClientesResponseV2List())
+                        .map(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento)
+                        .sort(Comparator.comparing(ClienteResponseV2::getNome))
+                        .zipWith(Flux.range(1, clientes.getClientesResponseV2List().size()),
+                                (clienteResponse, id) -> {
+                                    clienteResponse.setId(id);
+                                    return clienteResponse;
+                                }).doOnNext(client1 -> {
+                            try {
+                                clienteCSVHandler.consumesApiToCSV(client1);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }));
     }
     // GET
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
     public ClienteWrapper getClientes(CustomPageable pageable) throws IOException {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity entity = new HttpEntity(null, headers);
-        headers.set(HeadersDefault.AUTHORIZATION_KEY, HeadersDefault.AUTHORIZATION_VALUE);
-        ResponseEntity<String> clientesJson = restTemplate.exchange("https://api.jsonbin.io/v3/b/63fa39efc0e7653a057e6fa7", HttpMethod.GET, entity, String.class);
-
-        String JSON_SOURCE = clientesJson.getBody();
-        JsonNode jsonNode = objectMapper.readTree(JSON_SOURCE);
+        JsonNode jsonNode = objectMapper.readTree(clienteDAO.getClientes());
         JsonNode clientesNode = jsonNode.get("record");
         ClienteResponseWrapperDTO clientes = objectMapper.readValue(clientesNode.traverse(), new TypeReference<ClienteResponseWrapperDTO>(){});
         List<ClienteResponse> clienteList = clientes.getClientesResponseV2List().stream().sorted(Comparator.comparing(ClienteResponse::getNome)).collect(Collectors.toList());
-        AniversarioParaDNConversor conversor = new AniversarioParaDNConversor();
-        clienteList.forEach(element -> conversor.formatarAniversarioParaDataNascimento(element));
+        clienteList.forEach(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento);
         ClienteWrapper clienteWrapper = new ClienteWrapper();
         clienteWrapper.setClienteResponses(paginarLista(clienteList, pageable));
         clienteWrapper.setMetaData(new MetaData(clienteList.size()));
@@ -124,14 +108,10 @@ public class ClienteService {
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
     public Flux<ClienteWrapperV2> getClientesV2(CustomPageable pageable) {
-        Flux<String> record = client.get()
-                .uri("/b/63fa39efc0e7653a057e6fa7")
-                .retrieve()
-                .bodyToFlux(String.class);
 
-        return record.map(ClienteJsonParser::pegarJsonNode)
+        return clienteDAO.getClientesV2().map(ClienteJsonParser::pegarJsonNode)
                 .map(ClienteJsonParser::extrairNodeClientes)
-                .map(ClienteJsonParser::mapearParaListaDeClientes)
+                .map(ClienteJsonParser::mapearParaClientesWrapperDTO)
                 .flatMap(clientes -> {
                     Flux<ClienteResponseV2> flux = Flux.fromIterable(clientes.getClientesResponseV2List())
                             .map(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento)
@@ -167,7 +147,6 @@ public class ClienteService {
         int inicio, fim;
         inicio = (int) pageable.getOffset();
         fim = (inicio + pageable.getPageSize()) > lista.size() ? lista.size() : (inicio + pageable.getPageSize());
-        Page<ClienteResponse> paginacao = new CustomPageImpl<>(lista.stream().collect(Collectors.toList()).subList(inicio, fim), pageable, lista.size());
-        return paginacao;
+        return new CustomPageImpl<>(lista.stream().collect(Collectors.toList()).subList(inicio, fim), pageable, lista.size());
     }
 }

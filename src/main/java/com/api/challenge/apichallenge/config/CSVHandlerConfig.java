@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 
 @Configuration
 public class CSVHandlerConfig {
-    public static final String CSV_DIRECTORY_PATH = "D:\\FACULDADE\\";
+    public static final String CSV_DIRECTORY_PATH = "C:\\Users\\Renato\\IdeaProjects\\api-challenge\\src\\main\\resources\\";
 
     @Bean
     public ClienteCSVHandler clienteCSVHandler() {

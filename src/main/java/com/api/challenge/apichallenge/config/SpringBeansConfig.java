@@ -21,12 +21,6 @@ public class SpringBeansConfig {
     }
 
     @Bean
-    public ModelMapper mapper() {
-        ModelMapper mapper = new ModelMapper();
-        return mapper;
-    }
-
-    @Bean
     public ClienteJsonParser parser() {
         ClienteJsonParser parser = new ClienteJsonParser();
         return parser;
