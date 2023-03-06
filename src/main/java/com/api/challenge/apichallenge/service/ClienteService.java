@@ -4,6 +4,7 @@ import com.api.challenge.apichallenge.config.HeadersDefault;
 import com.api.challenge.apichallenge.dao.ClienteDAO;
 import com.api.challenge.apichallenge.dto.v1.ClienteResponseWrapperDTO;
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
+import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
 import com.api.challenge.apichallenge.exception.InvalidURIException;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
@@ -41,11 +42,11 @@ public class ClienteService {
     @Autowired
     ClienteDAO clienteDAO;
 
-    public ClienteRequest escreverNovaLinhaCSV(ClienteRequest clienteRequest) throws IOException {
+    public ClienteRequest escreverNovaLinhaCSV(ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth {
         return clienteCSVHandler.writeNewLine(clienteRequest);
     }
 
-    public ClienteRequest updateCSV(ClienteRequest cliente) throws IOException, ClienteInCSVNotFoundException {
+    public ClienteRequest updateCSV(ClienteRequest cliente) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth {
         return clienteCSVHandler.updateCSV(cliente);
     }
 

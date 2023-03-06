@@ -1,6 +1,7 @@
 package com.api.challenge.apichallenge.exception.handler;
 
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
+import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
 import com.api.challenge.apichallenge.exception.InvalidURIException;
 import com.api.challenge.apichallenge.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,13 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         ErrorResponse errorResponse = new ErrorResponse(404, e.getMessage());
         errorResponse.setTimestamp(LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(value = {InvalidDateOfBirth.class})
+    public ResponseEntity<ErrorResponse> invalidAteOfBirth(InvalidDateOfBirth e) {
+        ErrorResponse errorResponse = new ErrorResponse(400, e.getMessage());
+        errorResponse.setTimestamp(LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
 }
