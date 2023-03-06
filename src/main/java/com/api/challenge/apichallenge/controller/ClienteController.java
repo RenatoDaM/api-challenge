@@ -25,7 +25,7 @@ public class ClienteController implements ClienteOpenApiImpl {
     @Autowired
     ClienteService clienteService;
 
-    @RequestMapping("/v1/buscarClientes")
+    @RequestMapping(value = "/v1/buscarClientes", method = RequestMethod.GET)
     public ResponseEntity<ClienteWrapper> getClientes(
             @PageableDefault(size = 10) CustomPageable customPageable,
             @RequestParam(value = "idade", required = false) Integer idade,
@@ -35,7 +35,7 @@ public class ClienteController implements ClienteOpenApiImpl {
         return ResponseEntity.ok().body(filterCliente(clienteService.getClientes(customPageable), idade, sexo, aniversario, customPageable));
     }
 
-    @RequestMapping("/v2/buscarClientes")
+    @RequestMapping(value = "/v2/buscarClientes", method = RequestMethod.GET)
     public ResponseEntity<Flux<ClienteWrapperV2>> getClientesV2(
             @PageableDefault(size = 10, page = 0) CustomPageable customPageable,
             @RequestParam(value = "idade_min", required = false) Integer idadeMin,

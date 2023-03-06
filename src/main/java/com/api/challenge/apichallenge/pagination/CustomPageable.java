@@ -1,6 +1,7 @@
 package com.api.challenge.apichallenge.pagination;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.data.domain.AbstractPageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,7 +15,6 @@ import static org.springframework.beans.support.PagedListHolder.DEFAULT_PAGE_SIZ
         "unpaged",
         "paged"
 })
-
 public class CustomPageable extends AbstractPageRequest {
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_SIZE = 10;
