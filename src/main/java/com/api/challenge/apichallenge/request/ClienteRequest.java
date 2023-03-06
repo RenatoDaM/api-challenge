@@ -4,16 +4,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.opencsv.bean.CsvBindByPosition;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class ClienteRequest {
     @CsvBindByPosition(position = 0)
     @Schema(nullable = true, example = "null", description = "Ao criar você não insere o parâmetro e nem valor ID. Apenas deixei visível esse parâmetro pois após criar um novo cliente, irá retornar o valor do ID que ficou salvo no arquivo CSV.")
     Integer id;
+    @NotNull
+    @NotBlank
     @CsvBindByPosition(position = 1)
     String nome;
+    @NotNull
     @CsvBindByPosition(position = 2)
-    int idade;
+    Integer idade;
+    @NotNull
+    @NotBlank
     @CsvBindByPosition(position = 3)
     String sexo;
+    @NotNull
+    @NotBlank
     @Schema(example = "01-01-1997")
     @CsvBindByPosition(position = 4)
     String dataNascimento;
@@ -38,11 +48,11 @@ public class ClienteRequest {
         this.nome = nome;
     }
 
-    public int getIdade() {
+    public Integer getIdade() {
         return idade;
     }
 
-    public void setIdade(int idade) {
+    public void setIdade(Integer idade) {
         this.idade = idade;
     }
 

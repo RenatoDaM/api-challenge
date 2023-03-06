@@ -1,11 +1,10 @@
 package com.api.challenge.apichallenge.service;
 
-import com.api.challenge.apichallenge.config.HeadersDefault;
 import com.api.challenge.apichallenge.dao.ClienteDAO;
 import com.api.challenge.apichallenge.dto.v1.ClienteResponseWrapperDTO;
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
 import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
-import com.api.challenge.apichallenge.exception.InvalidURIException;
+import com.api.challenge.apichallenge.exception.MissingClienteParametersException;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import com.api.challenge.apichallenge.pagination.CustomPageImpl;
@@ -42,12 +41,18 @@ public class ClienteService {
     @Autowired
     ClienteDAO clienteDAO;
 
-    public ClienteRequest escreverNovaLinhaCSV(ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth {
+    public ClienteRequest escreverNovaLinhaCSV(ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
+        if (clienteRequest.getDataNascimento() == null || clienteRequest.getIdade() == null || clienteRequest.getSexo() == null || clienteRequest.getNome() == null) {
+            throw new MissingClienteParametersException("Parâmetro(s) obrigatório(s) não preenchido(s). Favor preencher corretamente.");
+        }
         return clienteCSVHandler.writeNewLine(clienteRequest);
     }
 
-    public ClienteRequest updateCSV(ClienteRequest cliente) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth {
-        return clienteCSVHandler.updateCSV(cliente);
+    public ClienteRequest updateCSV(ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth, MissingClienteParametersException {
+        if (clienteRequest.getDataNascimento() == null || clienteRequest.getIdade() == null || clienteRequest.getSexo() == null || clienteRequest.getNome() == null) {
+            throw new MissingClienteParametersException("Parâmetro(s) obrigatório(s) não preenchido(s). Favor preencher corretamente.");
+        }
+        return clienteCSVHandler.updateCSV(clienteRequest);
     }
 
     public void deleteCSVFile(Integer id) throws IOException, ClienteInCSVNotFoundException {
@@ -61,7 +66,7 @@ public class ClienteService {
     // POST
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
-    public Flux<ClienteResponseV2> postCSV() {
+    public Flux<ClienteResponseV2> criarArquivoCSV() {
         return clienteDAO.postCSV()
                 .map(ClienteJsonParser::pegarJsonNode)
                 .map(ClienteJsonParser::extrairNodeClientes)

@@ -3,6 +3,7 @@ package com.api.challenge.apichallenge.controller;
 import com.api.challenge.apichallenge.config.CSVHandlerConfig;
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
 import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
+import com.api.challenge.apichallenge.exception.MissingClienteParametersException;
 import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
@@ -53,14 +54,14 @@ public class ClienteController implements ClienteOpenApiImpl {
     @PostMapping("/v2/criarCSV")
     public ResponseEntity<Response> postarCSV() {
         Response response = new Response(201, "Arquivo CSV criado no diretório: " + CSVHandlerConfig.CSV_DIRECTORY_PATH + ClienteCSVHandler.CSV_FILE_NAME);
-        clienteService.postCSV();
+        clienteService.criarArquivoCSV();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // NECESSÁRIO USO DE REQUEST POR CONTA DA FORMA QUE IMPLEMENTEI O CONVERSOR DE ANIVERSÁRIO PARA DATA DE
     // NASCIMENTO. O setDataNascimento usa a propriedade json aniversario, ja o get usa o próprio atributo
     // dataNascimento.
     @PostMapping("/v2/adicionarPessoaCSV")
-    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth {
+    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.escreverNovaLinhaCSV(clienteRequest));
     }
 
@@ -80,7 +81,7 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @PutMapping("/v2/atualizarCSV")
-    public ResponseEntity<ClienteRequest> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth {
+    public ResponseEntity<ClienteRequest> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth, MissingClienteParametersException {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.updateCSV(clienteRequest));
     }
 
