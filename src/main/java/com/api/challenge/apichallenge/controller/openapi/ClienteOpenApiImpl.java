@@ -8,6 +8,7 @@ import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.ErrorResponse;
 import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
+import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -75,10 +76,10 @@ public interface ClienteOpenApiImpl {
 
     @Operation(summary = "Adiciona um cliente ao arquivo CSV no formato padrão separado por ;")
     @ApiResponses(value = {
-            @ApiResponse(description = "Adiciona um cliente ao arquivo CSV", responseCode = "201", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteRequest.class))),
+            @ApiResponse(description = "Adiciona um cliente ao arquivo CSV", responseCode = "201", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteResponseV2.class))),
             @ApiResponse(description = "Data de nascimento inválida. Exemplo de formato correto: 01-01-1997.", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException;
+    public ResponseEntity<ClienteResponseV2> adicionarPessoaCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException;
 
     @Operation(summary = "Retorna uma lista de clientes filtrados com base em vários parâmetros de consulta a partir do arquivo CSV",
             description = "Este endpoint retorna uma lista de clientes filtrados a partir do arquivo CSV com base nos parâmetros de consulta fornecidos. Os parâmetros de consulta são opcionais e podem ser usados em qualquer combinação.")
@@ -106,10 +107,10 @@ public interface ClienteOpenApiImpl {
 
     @Operation(summary = "Atualiza um cliente dentro do CSV. Lê o objeto no body do JSON e atualiza o objeto com o mesmo ID.")
     @ApiResponses(value = {
-            @ApiResponse(description = "Cliente atualizado", responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteRequest.class))),
+            @ApiResponse(description = "Cliente atualizado", responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteResponseV2.class))),
             @ApiResponse(description = "Data de nascimento inválida. Exemplo de formato correto: 01-01-1997.", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<ClienteRequest> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth, MissingClienteParametersException;
+    public ResponseEntity<ClienteResponseV2> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth, MissingClienteParametersException;
 
     @Operation(summary = "Deleta o cliente dentro do arquivo CSV que possui o ID fornecido.")
     @ApiResponses(value = {

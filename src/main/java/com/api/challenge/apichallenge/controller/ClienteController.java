@@ -6,6 +6,7 @@ import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
 import com.api.challenge.apichallenge.exception.MissingClienteParametersException;
 import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
+import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import com.api.challenge.apichallenge.pagination.CustomPageable;
 import com.api.challenge.apichallenge.controller.openapi.ClienteOpenApiImpl;
@@ -61,7 +62,7 @@ public class ClienteController implements ClienteOpenApiImpl {
     // NASCIMENTO. O setDataNascimento usa a propriedade json aniversario, ja o get usa o próprio atributo
     // dataNascimento.
     @PostMapping("/v2/adicionarPessoaCSV")
-    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
+    public ResponseEntity<ClienteResponseV2> adicionarPessoaCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.escreverNovaLinhaCSV(clienteRequest));
     }
 
@@ -81,7 +82,7 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @PutMapping("/v2/atualizarCSV")
-    public ResponseEntity<ClienteRequest> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth, MissingClienteParametersException {
+    public ResponseEntity<ClienteResponseV2> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth, MissingClienteParametersException {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.updateCSV(clienteRequest));
     }
 
