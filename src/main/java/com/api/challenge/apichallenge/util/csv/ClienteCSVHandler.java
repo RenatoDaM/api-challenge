@@ -93,15 +93,19 @@ public class ClienteCSVHandler {
     public void deleteCSVLine(Integer id) throws IOException, ClienteInCSVNotFound {
         List<ClienteResponseV2> clienteList = read();
         List<ClienteResponseV2> novaLista = new ArrayList<>();
-
-        for (ClienteResponseV2 cliente : clienteList) {
-            if (cliente.getId() == null) {
-                throw new ClienteInCSVNotFound("OPERAÇÃO DELETAR FALHOU. Não foi encontrado um cliente com o ID: " + id);
-            }
-            if (!cliente.getId().equals(id)) {
+        boolean idEncontrado = false;
+        for (int i = 0; i < clienteList.size(); i++) {
+            ClienteResponseV2 cliente = clienteList.get(i);
+            if (cliente.getId().equals(id)) {
+                idEncontrado = true;
+            } else {
                 novaLista.add(cliente);
             }
+            System.out.println(cliente.getNome());
         }
+
+        if (!idEncontrado) throw new ClienteInCSVNotFound("OPERAÇÃO DELETAR FALHOU. Não foi encontrado um cliente com o ID: " + id);
+
         reescreverCSV(novaLista);
     }
 
