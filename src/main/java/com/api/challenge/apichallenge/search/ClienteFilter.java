@@ -19,13 +19,13 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class ClienteFilter {
-    public static Page<ClienteResponseV2> filterClienteCSV(Page<ClienteResponseV2> clientes, Integer idadeMin, Integer idadeMax, String sexo, String dataNascMin, String dataNascMax, String mes, String dia) {
+    public static ClienteWrapperV2 filterClienteCSV(ClienteWrapperV2 clientes, Integer idadeMin, Integer idadeMax, String sexo, String dataNascMin, String dataNascMax, String mes, String dia, CustomPageable customPageable) {
 
         if (sexo == null && idadeMin == null && idadeMax == null && dataNascMin == null && dataNascMax == null && mes == null && dia == null) {
             return clientes;
         }
 
-        List<ClienteResponseV2> newClienteListResponse = clientes.toList();
+        List<ClienteResponseV2> newClienteListResponse = clientes.getClienteResponses().toList();
 
         if (idadeMin != null) {
             newClienteListResponse = newClienteListResponse.stream().filter(cliente -> cliente.getIdade() >= idadeMin).collect(Collectors.toList());
@@ -57,10 +57,9 @@ public class ClienteFilter {
             System.out.println("dia" + dia);
         }
 
-
-        Page<ClienteResponseV2> clientePage = new PageImpl<>(newClienteListResponse);
-
-        return  clientePage;
+        clientes.setMetaData(new MetaData(newClienteListResponse.size()));
+        clientes.setClienteResponses(paginarV2(newClienteListResponse, customPageable));
+        return  clientes;
     }
 
     public static ClienteWrapper filterCliente(ClienteWrapper wrapper, Integer idade, String sexo, String aniversario, CustomPageable customPageable) {

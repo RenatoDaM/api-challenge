@@ -62,13 +62,14 @@ public class ClienteService {
         clienteCSVHandler.deleteCSVLine(id);
     }
 
-    public Page<ClienteResponseV2> readCSV(CustomPageable pageable) throws FileNotFoundException {
-        return paginarListaV2(clienteCSVHandler.read(), pageable);
+    public ClienteWrapperV2 readCSV(CustomPageable pageable) throws FileNotFoundException {
+        return new ClienteWrapperV2(paginarListaV2(clienteCSVHandler.read(), pageable),
+                new MetaData(clienteCSVHandler.read().size()));
     }
     // POST
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
-    public Flux<Object> postCSV() {
+    public Flux<ClienteResponseV2> postCSV() {
         return client.get()
                 .uri("/b/63fa39efc0e7653a057e6fa7")
                 .retrieve()
@@ -134,7 +135,6 @@ public class ClienteService {
                 .map(ClienteJsonParser::extrairNodeClientes)
                 .map(ClienteJsonParser::mapearParaListaDeClientes)
                 .flatMap(clientes -> {
-                    System.out.println(clientes.getClientesResponseV2List());
                     Flux<ClienteResponseV2> flux = Flux.fromIterable(clientes.getClientesResponseV2List())
                             .map(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento)
                             .sort(Comparator.comparing(ClienteResponseV2::getNome))

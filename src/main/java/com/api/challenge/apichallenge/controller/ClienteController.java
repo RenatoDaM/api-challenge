@@ -1,5 +1,6 @@
 package com.api.challenge.apichallenge.controller;
 
+import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import com.api.challenge.apichallenge.pagination.CustomPageable;
@@ -8,7 +9,6 @@ import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +50,7 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @PostMapping("/v2/criarCSV")
-    public ResponseEntity<Flux<Object>> postarCSV() {
+    public ResponseEntity<Flux<ClienteResponseV2>> postarCSV() {
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.postCSV());
     }
     // NECESSÁRIO USO DE REQUEST POR CONTA DA FORMA QUE IMPLEMENTEI O CONVERSOR DE ANIVERSÁRIO PARA DATA DE
@@ -62,7 +62,7 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @GetMapping("/v2/lerCSV")
-    public ResponseEntity<Page<ClienteResponseV2>> lerCSV(
+    public ResponseEntity<ClienteWrapperV2> lerCSV(
             @PageableDefault(page = 0, size = 10) CustomPageable pageable,
             @RequestParam(value = "idade_min", required = false) Integer idadeMin,
             @RequestParam(value = "idade_max", required = false) Integer idadeMax,
@@ -71,9 +71,8 @@ public class ClienteController implements ClienteOpenApiImpl {
             @RequestParam(value = "dia", required = false) String dia,
             @RequestParam(value = "data_nasc_min", required = false) String dataNascMin,
             @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) throws  FileNotFoundException {
-        System.out.println("heellloooooooo");
 
-        Page<ClienteResponseV2> clienteResponseV2s = filterClienteCSV(clienteService.readCSV(pageable), idadeMin, idadeMax, sexo, dataNascMin, dataNascMax, mes, dia);
+        ClienteWrapperV2 clienteResponseV2s = filterClienteCSV(clienteService.readCSV(pageable), idadeMin, idadeMax, sexo, dataNascMin, dataNascMax, mes, dia, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(clienteResponseV2s);
     }
 
@@ -83,9 +82,9 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @DeleteMapping("/v2/deletarCSVLine/{id}")
-    public ResponseEntity deleteCSVFile(@PathVariable Integer id) throws IOException {
+    public ResponseEntity<Response> deleteCSVFile(@PathVariable Integer id) throws IOException {
         clienteService.deleteCSVFile(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new Response(204, "Deleted successfully"));
     }
 
 
