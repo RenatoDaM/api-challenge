@@ -2,6 +2,7 @@ package com.api.challenge.apichallenge.service;
 
 import com.api.challenge.apichallenge.dao.ClienteDAO;
 import com.api.challenge.apichallenge.dto.v1.ClienteResponseWrapperDTO;
+import com.api.challenge.apichallenge.dto.v2.ClienteResponseWrapperDTOV2;
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
 import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
 import com.api.challenge.apichallenge.exception.MissingClienteParametersException;
@@ -59,9 +60,8 @@ public class ClienteService {
         clienteCSVHandler.deleteCSVLine(id);
     }
 
-    public ClienteWrapperV2 readCSV(CustomPageable pageable) throws FileNotFoundException {
-        return new ClienteWrapperV2(paginarListaV2(clienteCSVHandler.read(), pageable),
-                new MetaData(clienteCSVHandler.read().size()));
+    public ClienteResponseWrapperDTOV2 readCSV() throws FileNotFoundException {
+        return new ClienteResponseWrapperDTOV2(clienteCSVHandler.read(), new MetaData(clienteCSVHandler.read().size()));
     }
     // POST
     @SuppressWarnings("unchecked")
@@ -105,9 +105,10 @@ public class ClienteService {
 
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
-    public Flux<ClienteWrapperV2> getClientesV2(CustomPageable pageable) {
+    public Flux<List<ClienteResponseV2>> getClientesV2() {
 
-        return clienteDAO.getClientesV2().map(ClienteJsonParser::pegarJsonNode)
+        return clienteDAO.getClientesV2()
+                .map(ClienteJsonParser::pegarJsonNode)
                 .map(ClienteJsonParser::extrairNodeClientes)
                 .map(ClienteJsonParser::mapearParaClientesWrapperDTO)
                 .flatMap(clientes -> {
@@ -120,14 +121,7 @@ public class ClienteService {
                                         return clienteResponse;
                                     });
 
-                    return flux
-                            .collectList()
-                            .map(clientesPaginados -> {
-                                Page<ClienteResponseV2> clienteResponseV2Page = paginarListaV2(clientesPaginados, pageable);
-                                MetaData metaData = new MetaData(clientesPaginados.size());
-                                ClienteWrapperV2 clienteWrapperV2 = new ClienteWrapperV2(clienteResponseV2Page, metaData);
-                                return clienteWrapperV2;
-                            });
+                    return flux.collectList();
                 });
     }
 

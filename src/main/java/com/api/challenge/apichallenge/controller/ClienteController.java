@@ -52,7 +52,7 @@ public class ClienteController implements ClienteOpenApiImpl {
             @RequestParam(value = "dia", required = false) String dia,
             @RequestParam(value = "data_nasc_min", required = false) String dataNascMin,
             @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) {
-        return ResponseEntity.ok().body(filterClienteV2(clienteService.getClientesV2(customPageable), idadeMin, idadeMax, sexo, dataNascMin, dataNascMax, mes, dia, customPageable));
+        return ResponseEntity.ok().body(filterClienteV2(clienteService.getClientesV2(), idadeMin, idadeMax, sexo, dataNascMin, dataNascMax, mes, dia, customPageable));
     }
 
     @PostMapping("/v2/criarCSV")
@@ -82,7 +82,7 @@ public class ClienteController implements ClienteOpenApiImpl {
             @RequestParam(value = "data_nasc_min", required = false) String dataNascMin,
             @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) throws  FileNotFoundException {
 
-        ClienteWrapperV2 clienteResponseV2s = filterClienteCSV(clienteService.readCSV(pageable), idadeMin, idadeMax, sexo, dataNascMin, dataNascMax, mes, dia, pageable);
+        ClienteWrapperV2 clienteResponseV2s = filterClienteCSV(clienteService.readCSV(), idadeMin, idadeMax, sexo, dataNascMin, dataNascMax, mes, dia, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(clienteResponseV2s);
     }
 

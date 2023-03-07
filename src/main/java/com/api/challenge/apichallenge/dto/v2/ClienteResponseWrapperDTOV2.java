@@ -11,6 +11,13 @@ public class ClienteResponseWrapperDTOV2 {
     @JsonProperty("clientes")
     List<ClienteResponseV2> clienteResponses;
 
+    public ClienteResponseWrapperDTOV2() {
+    }
+
+    public ClienteResponseWrapperDTOV2(List<ClienteResponseV2> clienteResponses, MetaData metaData) {
+        this.metaData = metaData;
+        this.clienteResponses = clienteResponses;
+    }
 
     public List<ClienteResponseV2> getClientesResponseV2List() {
         return clienteResponses;
