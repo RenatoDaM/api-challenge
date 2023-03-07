@@ -50,10 +50,10 @@ public interface ClienteOpenApiImpl {
             description = "Este endpoint retorna uma lista de clientes filtrados com base nos parâmetros de consulta fornecidos. Os parâmetros de consulta são opcionais e podem ser usados em qualquer combinação.")
     @Parameters(value = {
             @Parameter(name = "sexo", description = "Pesquisa apenas clientes do sexo definido: F ou M", example = "F"),
-            @Parameter(name = "idade_min", description = "Pesquisa apenas clientes com a idade maior ou igual ao valor inserido", example = "33"),
-            @Parameter(name = "idade_max", description = "Pesquisa apenas clientes com a idade menor ou igual ao valor inserido", example = "33"),
-            @Parameter(name = "mes", description = "Pesquisa clientes que fazem aniversário no mês inserido", example = "33"),
-            @Parameter(name = "dia", description = "Pesquisa clientes que fazem aniversário no dia inserido", example = "33"),
+            @Parameter(name = "idade_min", description = "Pesquisa apenas clientes com a idade maior ou igual ao valor inserido"),
+            @Parameter(name = "idade_max", description = "Pesquisa apenas clientes com a idade menor ou igual ao valor inserido"),
+            @Parameter(name = "mes", description = "Pesquisa clientes que fazem aniversário no mês inserido"),
+            @Parameter(name = "dia", description = "Pesquisa clientes que fazem aniversário no dia inserido"),
             @Parameter(name = "data_nasc_min", description = "Pesquisa clientes que nasceram na data inserida ou após", example = "01-01-1997"),
             @Parameter(name = "data_nasc_max", description = "Pesquisa clientes que nasceram na data inserida ou antes", example = "01-01-1997"),
             @Parameter(hidden = true, name = "customPageable")
@@ -86,10 +86,10 @@ public interface ClienteOpenApiImpl {
             description = "Este endpoint retorna uma lista de clientes filtrados a partir do arquivo CSV com base nos parâmetros de consulta fornecidos. Os parâmetros de consulta são opcionais e podem ser usados em qualquer combinação.")
     @Parameters(value = {
             @Parameter(name = "sexo", description = "Pesquisa apenas clientes do sexo definido: F ou M", example = "F"),
-            @Parameter(name = "idade_min", description = "Pesquisa apenas clientes com a idade maior ou igual ao valor inserido", example = "33"),
-            @Parameter(name = "idade_max", description = "Pesquisa apenas clientes com a idade menor ou igual ao valor inserido", example = "33"),
-            @Parameter(name = "mes", description = "Pesquisa clientes que fazem aniversário no mês inserido", example = "33"),
-            @Parameter(name = "dia", description = "Pesquisa clientes que fazem aniversário no dia inserido", example = "33"),
+            @Parameter(name = "idade_min", description = "Pesquisa apenas clientes com a idade maior ou igual ao valor inserido"),
+            @Parameter(name = "idade_max", description = "Pesquisa apenas clientes com a idade menor ou igual ao valor inserido"),
+            @Parameter(name = "mes", description = "Pesquisa clientes que fazem aniversário no mês inserido"),
+            @Parameter(name = "dia", description = "Pesquisa clientes que fazem aniversário no dia inserido"),
             @Parameter(name = "data_nasc_min", description = "Pesquisa clientes que nasceram na data inserida ou após", example = "01-01-1997"),
             @Parameter(name = "data_nasc_max", description = "Pesquisa clientes que nasceram na data inserida ou antes", example = "01-01-1997"),
             @Parameter(hidden = true, name = "pageable")
