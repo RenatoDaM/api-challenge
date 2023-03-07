@@ -9,8 +9,6 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBeanBuilder;
-import org.checkerframework.checker.regex.qual.Regex;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -35,7 +33,7 @@ public class ClienteCSVHandler {
         CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
         List<ClienteResponseV2> clientesList = read();
 
-        String regex = "\\d\\d-\\d\\d-\\d\\d\\d\\d";
+        String regex = "^\\d\\d-\\d\\d-\\d\\d\\d\\d$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(pessoa.getDataNascimento());
 
@@ -96,7 +94,7 @@ public class ClienteCSVHandler {
                 .build()
                 .parse();
 
-        String regex = "\\d\\d-\\d\\d-\\d\\d\\d\\d";
+        String regex = "^\\d\\d-\\d\\d-\\d\\d\\d\\d$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(clienteRequest.getDataNascimento());
         if (matcher.find()) {

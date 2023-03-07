@@ -16,14 +16,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+
+import javax.validation.Valid;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import static com.api.challenge.apichallenge.search.ClienteFilter.*;
 
 @RestController
 @RequestMapping("api-challenge/cliente")
+@Validated
 public class ClienteController implements ClienteOpenApiImpl {
     @Autowired
     ClienteService clienteService;
@@ -63,7 +67,7 @@ public class ClienteController implements ClienteOpenApiImpl {
 
     // Re
     @PostMapping("/v2/adicionarPessoaCSV")
-    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
+    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@Valid @RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.escreverNovaLinhaCSV(clienteRequest));
     }
 
@@ -83,7 +87,7 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @PutMapping("/v2/atualizarCSV")
-    public ResponseEntity<ClienteRequest> atualizarCSV(@RequestBody ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth, MissingClienteParametersException {
+    public ResponseEntity<ClienteRequest> atualizarCSV(@Valid @RequestBody ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth, MissingClienteParametersException {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.updateCSV(clienteRequest));
     }
 

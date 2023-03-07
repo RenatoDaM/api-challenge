@@ -43,4 +43,18 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    // EXEMPLO DE POSSÍVEL OUTRA FORMA DE IMPLEMENTAÇÃO:
+    /*@ExceptionHandler(value = { ConstraintViolationException.class })
+    protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
+        List<String> errors = new ArrayList<String>();
+        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+            errors.add(violation.getRootBeanClass().getName() + " " +
+                    violation.getPropertyPath() + ": " +
+                    violation.getMessage());
+        }
+
+        ErrorResponse errorResponse = new ErrorResponse(400, errors);
+        return handleExceptionInternal(ex, errorResponse, new HttpHeaders(), errorResponse.getStatus(), request);
+    }*/
+
 }
