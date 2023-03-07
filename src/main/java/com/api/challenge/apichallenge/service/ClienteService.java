@@ -7,12 +7,14 @@ import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
 import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
 import com.api.challenge.apichallenge.exception.MissingClienteParametersException;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
-import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import com.api.challenge.apichallenge.pagination.CustomPageImpl;
 import com.api.challenge.apichallenge.pagination.CustomPageable;
 import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.MetaData;
 import com.api.challenge.apichallenge.response.v1.ClienteResponse;
+import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
+import com.api.challenge.apichallenge.search.ClienteRequestParam;
+import com.api.challenge.apichallenge.search.filter.ClienteFilter;
 import com.api.challenge.apichallenge.util.csv.ClienteCSVHandler;
 import com.api.challenge.apichallenge.util.dateutil.AniversarioParaDNConversor;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
@@ -105,7 +107,7 @@ public class ClienteService {
 
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
-    public Flux<List<ClienteResponseV2>> getClientesV2() {
+    public Flux<ClienteWrapperV2> getClientesV2(ClienteRequestParam clienteRequestParam, CustomPageable customPageable) {
 
         return clienteDAO.getClientesV2()
                 .map(ClienteJsonParser::pegarJsonNode)
@@ -121,7 +123,7 @@ public class ClienteService {
                                         return clienteResponse;
                                     });
 
-                    return flux.collectList();
+                    return ClienteFilter.filterClienteV2(flux.collectList().flux(), clienteRequestParam, customPageable);
                 });
     }
 

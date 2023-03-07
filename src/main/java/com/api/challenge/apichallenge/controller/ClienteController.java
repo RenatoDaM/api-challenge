@@ -10,6 +10,7 @@ import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import com.api.challenge.apichallenge.pagination.CustomPageable;
 import com.api.challenge.apichallenge.controller.openapi.ClienteOpenApiImpl;
 import com.api.challenge.apichallenge.request.ClienteRequest;
+import com.api.challenge.apichallenge.search.ClienteRequestParam;
 import com.api.challenge.apichallenge.service.ClienteService;
 import com.api.challenge.apichallenge.util.csv.ClienteCSVHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ import reactor.core.publisher.Flux;
 import javax.validation.Valid;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import static com.api.challenge.apichallenge.search.ClienteFilter.*;
+import static com.api.challenge.apichallenge.search.filter.ClienteFilter.*;
 
 @RestController
 @RequestMapping("api-challenge/cliente")
@@ -52,7 +53,8 @@ public class ClienteController implements ClienteOpenApiImpl {
             @RequestParam(value = "dia", required = false) String dia,
             @RequestParam(value = "data_nasc_min", required = false) String dataNascMin,
             @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) {
-        return ResponseEntity.ok().body(filterClienteV2(clienteService.getClientesV2(), idadeMin, idadeMax, sexo, dataNascMin, dataNascMax, mes, dia, customPageable));
+        ClienteRequestParam clienteRequestParam = new ClienteRequestParam(idadeMin, idadeMax, sexo, mes, dia, dataNascMin, dataNascMax);
+        return ResponseEntity.ok().body(clienteService.getClientesV2(clienteRequestParam, customPageable));
     }
 
     @PostMapping("/v2/criarCSV")

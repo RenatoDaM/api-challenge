@@ -2,7 +2,7 @@ package com.api.challenge.apichallenge.util.csv;
 
 import com.opencsv.bean.CsvToBeanFilter;
 
-public class ClienteCSVFilter implements CsvToBeanFilter {
+public class ClienteCSVIsFirstLine implements CsvToBeanFilter {
     private boolean isFirstLine = true;
 
     @Override

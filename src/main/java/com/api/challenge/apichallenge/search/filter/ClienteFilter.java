@@ -1,4 +1,4 @@
-package com.api.challenge.apichallenge.search;
+package com.api.challenge.apichallenge.search.filter;
 
 import com.api.challenge.apichallenge.dto.v2.ClienteResponseWrapperDTOV2;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
@@ -8,6 +8,7 @@ import com.api.challenge.apichallenge.pagination.CustomPageable;
 import com.api.challenge.apichallenge.response.v1.ClienteResponse;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.response.MetaData;
+import com.api.challenge.apichallenge.search.ClienteRequestParam;
 import org.springframework.data.domain.Page;
 import reactor.core.publisher.Flux;
 import java.time.LocalDate;
@@ -49,12 +50,13 @@ public class ClienteFilter {
         return  wrapper;
     }
 
-    public static Flux<ClienteWrapperV2> filterClienteV2(Flux<List<ClienteResponseV2>> clientesFlux, Integer idadeMin, Integer idadeMax, String sexo, String dataNascMin, String dataNascMax, String mes, String dia, CustomPageable customPageable) {
+    public static Flux<ClienteWrapperV2> filterClienteV2(Flux<List<ClienteResponseV2>> clientesFlux, ClienteRequestParam clienteRequestParam, CustomPageable customPageable) {
         return clientesFlux.flatMap(clientes -> {
 
-
-            List<ClienteResponseV2> newClienteListResponse = aplicarFiltros(clientes, idadeMin, idadeMax, sexo, dataNascMin, dataNascMax, mes, dia);
-
+            List<ClienteResponseV2> newClienteListResponse = aplicarFiltros(clientes,
+                    clienteRequestParam.getIdadeMin(), clienteRequestParam.getIdadeMax(),
+                    clienteRequestParam.getSexo(), clienteRequestParam.getDataNascMin(),
+                    clienteRequestParam.getDataNascMax(), clienteRequestParam.getMes(), clienteRequestParam.getDia());
 
             MetaData metaData = new MetaData(newClienteListResponse.size());
 

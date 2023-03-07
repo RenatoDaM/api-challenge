@@ -78,7 +78,7 @@ public class ClienteCSVHandler {
 
         return (List<ClienteResponseV2>) new CsvToBeanBuilder(csvReader)
                 .withType(ClienteResponseV2.class)
-                .withFilter(new ClienteCSVFilter())
+                .withFilter(new ClienteCSVIsFirstLine())
                 .build()
                 .parse();
     }
@@ -90,7 +90,7 @@ public class ClienteCSVHandler {
 
         List<ClienteRequest> clienteList = new CsvToBeanBuilder(csvReader)
                 .withType(ClienteRequest.class)
-                .withFilter(new ClienteCSVFilter())
+                .withFilter(new ClienteCSVIsFirstLine())
                 .build()
                 .parse();
 
