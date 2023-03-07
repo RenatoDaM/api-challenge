@@ -125,14 +125,6 @@ public class ClienteService {
                 });
     }
 
-    private Page<ClienteResponseV2> paginarListaV2(List<ClienteResponseV2> lista, CustomPageable pageable){
-        int inicio, fim;
-        inicio = (int) pageable.getOffset();
-        fim = (inicio + pageable.getPageSize()) > lista.size() ? lista.size() : (inicio + pageable.getPageSize());
-        Page<ClienteResponseV2> paginacao = new CustomPageImpl<>(lista.stream().collect(Collectors.toList()).subList(inicio, fim), pageable, lista.size());
-        return paginacao;
-    }
-
     private Page<ClienteResponse> paginarLista(List<ClienteResponse> lista, CustomPageable pageable){
         int inicio, fim;
         inicio = (int) pageable.getOffset();
