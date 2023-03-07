@@ -19,10 +19,9 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class ClienteFilter {
-    public static ClienteWrapperV2 filterClienteCSV(ClienteResponseWrapperDTOV2 clientes, Integer idadeMin, Integer idadeMax, String sexo, String dataNascMin, String dataNascMax, String mes, String dia, CustomPageable customPageable) {
+    public static ClienteWrapperV2 filterClienteCSV(List<ClienteResponseV2> clienteResponseV2List, ClienteRequestParam clienteRequestParam, CustomPageable customPageable) {
 
-        List<ClienteResponseV2> newClienteListResponse2 = aplicarFiltros(clientes.getClientesResponseV2List(), idadeMin, idadeMax, sexo, dataNascMin, dataNascMax, mes, dia);
-
+        List<ClienteResponseV2> newClienteListResponse2 = aplicarFiltros(clienteResponseV2List, clienteRequestParam);
         return new ClienteWrapperV2(paginarV2(newClienteListResponse2, customPageable), new MetaData(newClienteListResponse2.size()));
     }
 
@@ -53,10 +52,7 @@ public class ClienteFilter {
     public static Flux<ClienteWrapperV2> filterClienteV2(Flux<List<ClienteResponseV2>> clientesFlux, ClienteRequestParam clienteRequestParam, CustomPageable customPageable) {
         return clientesFlux.flatMap(clientes -> {
 
-            List<ClienteResponseV2> newClienteListResponse = aplicarFiltros(clientes,
-                    clienteRequestParam.getIdadeMin(), clienteRequestParam.getIdadeMax(),
-                    clienteRequestParam.getSexo(), clienteRequestParam.getDataNascMin(),
-                    clienteRequestParam.getDataNascMax(), clienteRequestParam.getMes(), clienteRequestParam.getDia());
+            List<ClienteResponseV2> newClienteListResponse = aplicarFiltros(clientes, clienteRequestParam);
 
             MetaData metaData = new MetaData(newClienteListResponse.size());
 
@@ -71,41 +67,39 @@ public class ClienteFilter {
         return data;
     }
 
-    public static List<ClienteResponseV2> aplicarFiltros(List<ClienteResponseV2> clientes, Integer idadeMin, Integer idadeMax, String sexo, String dataNascMin, String dataNascMax, String mes, String dia) {
-        if (sexo == null && idadeMin == null && idadeMax == null && dataNascMin == null && dataNascMax == null && mes == null && dia == null) {
+    public static List<ClienteResponseV2> aplicarFiltros(List<ClienteResponseV2> clientes, ClienteRequestParam clienteRequestParam) {
+        if (clienteRequestParam.getSexo() == null && clienteRequestParam.getIdadeMin() == null && clienteRequestParam.getIdadeMax() == null && clienteRequestParam.getDataNascMin() == null && clienteRequestParam.getDataNascMax() == null && clienteRequestParam.getMes() == null && clienteRequestParam.getDia() == null) {
             return clientes;
         }
 
         List<ClienteResponseV2> newClienteListResponse2 = new ArrayList<>();
 
-        if (idadeMin != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getIdade() >= idadeMin).collect(Collectors.toList()));
+        if (clienteRequestParam.getIdadeMin() != null) {
+            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getIdade() >= clienteRequestParam.getIdadeMin()).collect(Collectors.toList()));
         }
 
-        if (idadeMax != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getIdade() <= idadeMax).collect(Collectors.toList()));
+        if (clienteRequestParam.getIdadeMax() != null) {
+            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getIdade() <= clienteRequestParam.getIdadeMax()).collect(Collectors.toList()));
         }
 
-        if (sexo != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getSexo().equalsIgnoreCase(sexo)).collect(Collectors.toList()));
+        if (clienteRequestParam.getSexo() != null) {
+            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getSexo().equalsIgnoreCase(clienteRequestParam.getSexo())).collect(Collectors.toList()));
         }
 
-        if (dataNascMin != null && dataNascMax == null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isAfter(stringParaDataNascimento(dataNascMin))).collect(Collectors.toList()));
+        if (clienteRequestParam.getDataNascMin() != null && clienteRequestParam.getDataNascMax() == null) {
+            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isAfter(stringParaDataNascimento(clienteRequestParam.getDataNascMin()))).collect(Collectors.toList()));
         }
 
-        if (dataNascMax != null && dataNascMin == null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isBefore(stringParaDataNascimento(dataNascMax))).collect(Collectors.toList()));
+        if (clienteRequestParam.getDataNascMax() != null && clienteRequestParam.getDataNascMin() == null) {
+            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isBefore(stringParaDataNascimento(clienteRequestParam.getDataNascMax()))).collect(Collectors.toList()));
         }
 
-        if (mes != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getMonthValue() == (Integer.valueOf(mes))).collect(Collectors.toList()));
-            System.out.println("mes" + mes);
+        if (clienteRequestParam.getMes() != null) {
+            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getMonthValue() == (Integer.valueOf(clienteRequestParam.getMes()))).collect(Collectors.toList()));
         }
 
-        if (dia != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getDayOfMonth() == (Integer.valueOf(dia))).collect(Collectors.toList()));
-            System.out.println("dia" + dia);
+        if (clienteRequestParam.getDia() != null) {
+            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getDayOfMonth() == (Integer.valueOf(clienteRequestParam.getDia()))).collect(Collectors.toList()));
         }
 
         return newClienteListResponse2;

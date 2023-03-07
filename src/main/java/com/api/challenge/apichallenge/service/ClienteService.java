@@ -62,8 +62,9 @@ public class ClienteService {
         clienteCSVHandler.deleteCSVLine(id);
     }
 
-    public ClienteResponseWrapperDTOV2 readCSV() throws FileNotFoundException {
-        return new ClienteResponseWrapperDTOV2(clienteCSVHandler.read(), new MetaData(clienteCSVHandler.read().size()));
+    public ClienteWrapperV2 readCSV(ClienteRequestParam clienteRequestParam, CustomPageable customPageable) throws FileNotFoundException {
+
+        return ClienteFilter.filterClienteCSV(clienteCSVHandler.read(), clienteRequestParam, customPageable);
     }
     // POST
     @SuppressWarnings("unchecked")
@@ -83,6 +84,7 @@ public class ClienteService {
                                 }).doOnNext(client1 -> {
                             try {
                                 clienteCSVHandler.consumesApiToCSV(client1);
+                                System.out.println(client1.getNome());
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }

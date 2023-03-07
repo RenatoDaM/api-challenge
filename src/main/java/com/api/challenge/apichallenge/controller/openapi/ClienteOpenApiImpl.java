@@ -8,6 +8,7 @@ import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.ErrorResponse;
 import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
+import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -72,7 +73,7 @@ public interface ClienteOpenApiImpl {
 
     @Operation(summary = "Cria um arquivo CSV no diretório definido na API a partir do GET realizado na API mockada.")
     @ApiResponse(description = "Cria um arquivo CSV no diretório padrão definido na aplicação. O arquivo CSV contém a lista recebida através do GET da API mockada. Essa requisição reescreve o arquivo caso já exista.", responseCode = "201", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Response.class)))
-    public ResponseEntity<Response> postarCSV();
+    public ResponseEntity<Flux<ClienteResponseV2>> postarCSV();
 
     @Operation(summary = "Adiciona um cliente ao arquivo CSV no formato padrão separado por ;")
     @ApiResponses(value = {
