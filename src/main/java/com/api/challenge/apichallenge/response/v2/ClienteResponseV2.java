@@ -2,7 +2,6 @@ package com.api.challenge.apichallenge.response.v2;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.opencsv.bean.CsvBindByPosition;
-import com.opencsv.bean.CsvNumber;
 
 public class ClienteResponseV2 {
     @CsvBindByPosition(position = 0)

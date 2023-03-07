@@ -1,11 +1,25 @@
 package com.api.challenge.apichallenge.response.v2;
 
 import com.api.challenge.apichallenge.response.MetaData;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.domain.Page;
-
+@JsonIgnoreProperties({
+        "sort",
+        "unpaged",
+        "paged"
+})
 public class ClienteWrapperV2 {
     MetaData metaData;
+    @JsonIgnoreProperties(value = {
+            "sort",
+            "last",
+            "first",
+            "size",
+            "number",
+            "empty",
+            "totalElements"
+    })
     @JsonProperty("clientes")
     Page<ClienteResponseV2> clienteResponses;
 

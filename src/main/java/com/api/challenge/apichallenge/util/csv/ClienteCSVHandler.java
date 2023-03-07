@@ -34,21 +34,16 @@ public class ClienteCSVHandler {
         FileWriter fileWriter = new FileWriter(FILE_PATH + CSV_FILE_NAME, true);
         CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
         List<ClienteResponseV2> clientesList = read();
+
         String regex = "\\d\\d-\\d\\d-\\d\\d\\d\\d";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(pessoa.getDataNascimento());
+
         if (matcher.find()) {
             System.out.println(clientesList.size());
             System.out.println(clientesList.get(clientesList.size()-3).getNome());
 
             ClienteResponseV2 clienteResponseV2 = clientesList.get(clientesList.size()-1);
-            // Eu tinha implementado uma lógica antes aonde essa classe era um Bean, aonde inicializava
-            // já com uma variável lastIndex que recebia o ultimo ID da lista no momento da inicialização (lia o
-            // arquivo ao inicializar a aplicação), e esse atributo
-            // era usado para as lógicas, com o objetivo de não ter que ficar lendo o arquivo toda hora.
-            // Porém, pensando pelo lado que alguém pode abrir o arquivo e apagar, achei mais safe ler sim
-            // várias vezes. Porém, dependendo da regra de negócio seria sim possível, já que ID's (dependendo
-            // da regra) são apenas para identificação, nao possuem um valor além desse.
             String[] linha = {Integer.toString(clienteResponseV2.getId()+1), pessoa.getNome(),
                     Integer.toString(pessoa.getIdade()), pessoa.getSexo(), pessoa.getDataNascimento()};
             csvWriter.writeNext(linha);

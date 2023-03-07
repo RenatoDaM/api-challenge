@@ -18,7 +18,6 @@ import java.util.stream.Stream;
         "sort",
         "last",
         "first",
-
         "size",
         "number",
         "empty",
@@ -100,7 +99,7 @@ public class CustomPageImpl<T> extends PageImpl<T> {
         return super.spliterator();
     }
 
-    public CustomPageImpl(List<T> content, Pageable pageable, long total) {
+    public CustomPageImpl(List<T> content, CustomPageable pageable, long total) {
         super(content, pageable, total);
     }
 }

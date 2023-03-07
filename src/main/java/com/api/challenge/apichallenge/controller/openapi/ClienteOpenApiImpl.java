@@ -8,12 +8,13 @@ import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.ErrorResponse;
 import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
-import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -59,7 +60,7 @@ public interface ClienteOpenApiImpl {
             @Parameter(hidden = true, name = "customPageable")
     })
     @PageableAsQueryParam
-    @ApiResponse(description = "Retorna um JSON com ClienteWrapperV2.", responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteWrapper.class)))
+    @ApiResponse(description = "Retorna um JSON com ClienteWrapperV2.", responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteWrapperV2.class)))
     public ResponseEntity<Flux<ClienteWrapperV2>> getClientesV2(
             @PageableDefault(size = 10, page = 0) CustomPageable customPageable,
             @RequestParam(value = "idade_min", required = false) Integer idadeMin,
