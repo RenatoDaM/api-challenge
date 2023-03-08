@@ -20,10 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import javax.validation.Valid;
@@ -41,11 +38,15 @@ public interface ClienteOpenApiImpl {
     })
     @ApiResponse(description = "Retorna um JSON com ClienteWrapper.", responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClienteWrapper.class)))
     @PageableAsQueryParam
-    ResponseEntity<ClienteWrapper> getClientes(
-            @PageableDefault(size = 10) CustomPageable customPageable,
-            @RequestParam(value = "idade", required = false) Integer idade,
+     ResponseEntity<ClienteWrapper> getClientes(
+            @PageableDefault(size = 10, page = 0) CustomPageable customPageable,
+            @RequestParam(value = "idade_min", required = false) Integer idadeMin,
+            @RequestParam(value = "idade_max", required = false) Integer idadeMax,
             @RequestParam(value = "sexo", required = false) String sexo,
-            @RequestParam(value = "aniversario", required = false) String aniversario) throws IOException;
+            @RequestParam(value = "mes", required = false) String mes,
+            @RequestParam(value = "dia", required = false) String dia,
+            @RequestParam(value = "data_nasc_min", required = false) String dataNascMin,
+            @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) throws IOException;
 
     @Operation(summary = "Retorna uma lista de clientes filtrados com base em vários parâmetros de consulta",
             description = "Este endpoint retorna uma lista de clientes filtrados com base nos parâmetros de consulta fornecidos. Os parâmetros de consulta são opcionais e podem ser usados em qualquer combinação.")

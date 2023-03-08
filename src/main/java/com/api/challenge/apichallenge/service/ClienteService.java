@@ -93,7 +93,7 @@ public class ClienteService {
     // GET
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
-    public ClienteWrapper getClientes(CustomPageable pageable) throws IOException {
+    public ClienteWrapper getClientes(ClienteRequestParam clienteRequestParam, CustomPageable pageable) throws IOException {
         JsonNode jsonNode = objectMapper.readTree(clienteDAO.getClientes());
         JsonNode clientesNode = jsonNode.get("record");
         ClienteResponseWrapperDTO clientes = objectMapper.readValue(clientesNode.traverse(), new TypeReference<ClienteResponseWrapperDTO>(){});

@@ -19,11 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-
 import javax.validation.Valid;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import static com.api.challenge.apichallenge.search.filter.ClienteFilter.*;
 
 @RestController
 @RequestMapping("api-challenge/cliente")
@@ -34,12 +32,16 @@ public class ClienteController implements ClienteOpenApiImpl {
 
     @RequestMapping(value = "/v1/buscarClientes", method = RequestMethod.GET)
     public ResponseEntity<ClienteWrapper> getClientes(
-            @PageableDefault(size = 10) CustomPageable customPageable,
-            @RequestParam(value = "idade", required = false) Integer idade,
+            @PageableDefault(size = 10, page = 0) CustomPageable customPageable,
+            @RequestParam(value = "idade_min", required = false) Integer idadeMin,
+            @RequestParam(value = "idade_max", required = false) Integer idadeMax,
             @RequestParam(value = "sexo", required = false) String sexo,
-            @RequestParam(value = "aniversario", required = false) String aniversario) throws IOException {
-
-        return ResponseEntity.ok().body(filterCliente(clienteService.getClientes(customPageable), idade, sexo, aniversario, customPageable));
+            @RequestParam(value = "mes", required = false) String mes,
+            @RequestParam(value = "dia", required = false) String dia,
+            @RequestParam(value = "data_nasc_min", required = false) String dataNascMin,
+            @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) throws IOException {
+        ClienteRequestParam clienteRequestParam = new ClienteRequestParam(idadeMin, idadeMax, sexo, mes, dia, dataNascMin, dataNascMax);
+        return ResponseEntity.ok().body(clienteService.getClientes(clienteRequestParam, customPageable));
     }
 
     @RequestMapping(value = "/v2/buscarClientes", method = RequestMethod.GET)
@@ -58,14 +60,9 @@ public class ClienteController implements ClienteOpenApiImpl {
 
     @PostMapping("/v2/criarCSV")
     public ResponseEntity<Flux<ClienteResponseV2>> postarCSV() {
-
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.criarArquivoCSV());
     }
-    // NECESSÁRIO USO DE REQUEST POR CONTA DA FORMA QUE IMPLEMENTEI O CONVERSOR DE ANIVERSÁRIO PARA DATA DE
-    // NASCIMENTO. O setDataNascimento usa a propriedade json aniversario, ja o get usa o próprio atributo
-    // dataNascimento.
 
-    // Re
     @PostMapping("/v2/adicionarPessoaCSV")
     public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@Valid @RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.escreverNovaLinhaCSV(clienteRequest));
@@ -90,10 +87,10 @@ public class ClienteController implements ClienteOpenApiImpl {
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.updateCSV(clienteRequest));
     }
 
-    @DeleteMapping("/v2/deletarCSVLine/{id}")
+    @DeleteMapping("/v2/deletarPessoaCSV/{id}")
     public ResponseEntity<Response> deleteCSVFile(@PathVariable Integer id) throws IOException, ClienteInCSVNotFoundException {
         clienteService.deleteCSVFile(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new Response(204, "Deleted successfully"));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new Response(204, "Delatado com sucesso"));
     }
 
 
