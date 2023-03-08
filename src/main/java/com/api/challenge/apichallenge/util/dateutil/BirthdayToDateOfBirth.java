@@ -24,15 +24,19 @@ public class BirthdayToDateOfBirth {
         return clienteResponse;
     }
 
-    public static ClienteResponseV2 convertBirthdayToDateOfBirth(ClienteResponseV2 clienteResponseV2) {
+    public static ClienteResponseV2 convertBirthdayToDateOfBirthV2(ClienteResponseV2 clienteResponseV2) {
+        if (clienteResponseV2.getDataNascimento().matches("^\\d\\d-\\d\\d-\\d\\d\\d\\d$")) {
+            System.out.println(clienteResponseV2.getId());
 
+            return clienteResponseV2;
+        }
+        System.out.println(clienteResponseV2.getId());
         Locale LOCALE_BRAZIL = new Locale("pt", "BR");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy", LOCALE_BRAZIL);
         String concatenarAno = clienteResponseV2.getDataNascimento() + "-" + Integer.toString(2023 - clienteResponseV2.getIdade());
         LocalDate localDate = LocalDate.parse(concatenarAno, formatter);
 
         clienteResponseV2.setDataNascimento(checkIfhadBirthdayThisYear(localDate).format(formatter));
-
         return clienteResponseV2;
     }
 
