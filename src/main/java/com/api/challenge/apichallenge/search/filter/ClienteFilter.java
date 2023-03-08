@@ -24,10 +24,10 @@ public class ClienteFilter {
         return new ClienteWrapperV2(paginarV2(newClienteListResponse2, customPageable), new MetaData(newClienteListResponse2.size()));
     }
 
-    public static ClienteWrapper filterCliente(List<ClienteResponse> clienteResponseList, ClienteRequestParam clienteRequestParam, CustomPageable customPageable) {
+    public static List<ClienteResponse> filterCliente(List<ClienteResponse> clienteResponseList, ClienteRequestParam clienteRequestParam) {
 
         List<ClienteResponse> newClienteListResponse = aplicarFiltros(clienteResponseList, clienteRequestParam);
-        return  new ClienteWrapper(paginar(newClienteListResponse, customPageable), new MetaData(newClienteListResponse.size()));
+        return newClienteListResponse;
     }
 
     public static Flux<ClienteWrapperV2> filterClienteV2(Flux<List<ClienteResponseV2>> clientesFlux, ClienteRequestParam clienteRequestParam, CustomPageable customPageable) {
@@ -51,35 +51,15 @@ public class ClienteFilter {
             return clientes;
         }
 
-        List<ClienteResponse> newClienteListResponse2 = new ArrayList<>();
-
-        if (clienteRequestParam.getIdadeMin() != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getIdade() >= clienteRequestParam.getIdadeMin()).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getIdadeMax() != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getIdade() <= clienteRequestParam.getIdadeMax()).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getSexo() != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getSexo().equalsIgnoreCase(clienteRequestParam.getSexo())).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getDataNascMin() != null && clienteRequestParam.getDataNascMax() == null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isAfter(stringParaDataNascimento(clienteRequestParam.getDataNascMin()))).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getDataNascMax() != null && clienteRequestParam.getDataNascMin() == null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isBefore(stringParaDataNascimento(clienteRequestParam.getDataNascMax()))).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getMes() != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getMonthValue() == (Integer.valueOf(clienteRequestParam.getMes()))).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getDia() != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getDayOfMonth() == (Integer.valueOf(clienteRequestParam.getDia()))).collect(Collectors.toList()));
-        }
+        List<ClienteResponse> newClienteListResponse2 = clientes.stream()
+                .filter(cliente -> clienteRequestParam.getIdadeMin() == null || cliente.getIdade() >= clienteRequestParam.getIdadeMin())
+                .filter(cliente -> clienteRequestParam.getIdadeMax() == null || cliente.getIdade() <= clienteRequestParam.getIdadeMax())
+                .filter(cliente -> clienteRequestParam.getSexo() == null || cliente.getSexo().equalsIgnoreCase(clienteRequestParam.getSexo()))
+                .filter(cliente -> clienteRequestParam.getDataNascMin() == null || stringParaDataNascimento(cliente.getDataNascimento()).isAfter(stringParaDataNascimento(clienteRequestParam.getDataNascMin())))
+                .filter(cliente -> clienteRequestParam.getDataNascMax() == null || stringParaDataNascimento(cliente.getDataNascimento()).isBefore(stringParaDataNascimento(clienteRequestParam.getDataNascMax())))
+                .filter(cliente -> clienteRequestParam.getMes() == null || stringParaDataNascimento(cliente.getDataNascimento()).getMonthValue() == (Integer.valueOf(clienteRequestParam.getMes())))
+                .filter(cliente -> clienteRequestParam.getDia() == null || stringParaDataNascimento(cliente.getDataNascimento()).getDayOfMonth() == (Integer.valueOf(clienteRequestParam.getDia())))
+                .collect(Collectors.toList());
 
         return newClienteListResponse2;
     }
@@ -89,36 +69,15 @@ public class ClienteFilter {
             return clientes;
         }
 
-        List<ClienteResponseV2> newClienteListResponse2 = new ArrayList<>();
-
-        if (clienteRequestParam.getIdadeMin() != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getIdade() >= clienteRequestParam.getIdadeMin()).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getIdadeMax() != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getIdade() <= clienteRequestParam.getIdadeMax()).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getSexo() != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> cliente.getSexo().equalsIgnoreCase(clienteRequestParam.getSexo())).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getDataNascMin() != null && clienteRequestParam.getDataNascMax() == null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isAfter(stringParaDataNascimento(clienteRequestParam.getDataNascMin()))).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getDataNascMax() != null && clienteRequestParam.getDataNascMin() == null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).isBefore(stringParaDataNascimento(clienteRequestParam.getDataNascMax()))).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getMes() != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getMonthValue() == (Integer.valueOf(clienteRequestParam.getMes()))).collect(Collectors.toList()));
-        }
-
-        if (clienteRequestParam.getDia() != null) {
-            newClienteListResponse2.addAll(clientes.stream().filter(cliente -> stringParaDataNascimento(cliente.getDataNascimento()).getDayOfMonth() == (Integer.valueOf(clienteRequestParam.getDia()))).collect(Collectors.toList()));
-        }
-
+        List<ClienteResponseV2> newClienteListResponse2 = clientes.stream()
+                .filter(cliente -> clienteRequestParam.getIdadeMin() == null || cliente.getIdade() >= clienteRequestParam.getIdadeMin())
+                .filter(cliente -> clienteRequestParam.getIdadeMax() == null || cliente.getIdade() <= clienteRequestParam.getIdadeMax())
+                .filter(cliente -> clienteRequestParam.getSexo() == null || cliente.getSexo().equalsIgnoreCase(clienteRequestParam.getSexo()))
+                .filter(cliente -> clienteRequestParam.getDataNascMin() == null || stringParaDataNascimento(cliente.getDataNascimento()).isAfter(stringParaDataNascimento(clienteRequestParam.getDataNascMin())))
+                .filter(cliente -> clienteRequestParam.getDataNascMax() == null || stringParaDataNascimento(cliente.getDataNascimento()).isBefore(stringParaDataNascimento(clienteRequestParam.getDataNascMax())))
+                .filter(cliente -> clienteRequestParam.getMes() == null || stringParaDataNascimento(cliente.getDataNascimento()).getMonthValue() == (Integer.valueOf(clienteRequestParam.getMes())))
+                .filter(cliente -> clienteRequestParam.getDia() == null || stringParaDataNascimento(cliente.getDataNascimento()).getDayOfMonth() == (Integer.valueOf(clienteRequestParam.getDia())))
+                .collect(Collectors.toList());
         return newClienteListResponse2;
     }
 
