@@ -7,9 +7,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class AniversarioParaDNConversor {
+public class birthdayToDateOfBirth {
 
-    public AniversarioParaDNConversor() {
+    public birthdayToDateOfBirth() {
     }
 
     public static ClienteResponse formatarAniversarioParaDataNascimento(ClienteResponse clienteResponse) {

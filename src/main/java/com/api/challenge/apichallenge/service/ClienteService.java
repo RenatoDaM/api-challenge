@@ -2,7 +2,6 @@ package com.api.challenge.apichallenge.service;
 
 import com.api.challenge.apichallenge.dao.ClienteDAO;
 import com.api.challenge.apichallenge.dto.v1.ClienteResponseWrapperDTO;
-import com.api.challenge.apichallenge.dto.v2.ClienteResponseWrapperDTOV2;
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
 import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
 import com.api.challenge.apichallenge.exception.MissingClienteParametersException;
@@ -16,7 +15,7 @@ import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
 import com.api.challenge.apichallenge.search.ClienteRequestParam;
 import com.api.challenge.apichallenge.search.filter.ClienteFilter;
 import com.api.challenge.apichallenge.util.csv.ClienteCSVHandler;
-import com.api.challenge.apichallenge.util.dateutil.AniversarioParaDNConversor;
+import com.api.challenge.apichallenge.util.dateutil.birthdayToDateOfBirth;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.util.jsonparser.ClienteJsonParser;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -75,7 +74,7 @@ public class ClienteService {
                 .map(ClienteJsonParser::extrairNodeClientes)
                 .map(ClienteJsonParser::mapearParaClientesWrapperDTO)
                 .flatMap(clientes -> Flux.fromIterable(clientes.getClientesResponseV2List())
-                        .map(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento)
+                        .map(birthdayToDateOfBirth::formatarAniversarioParaDataNascimento)
                         .sort(Comparator.comparing(ClienteResponseV2::getNome))
                         .zipWith(Flux.range(1, clientes.getClientesResponseV2List().size()),
                                 (clienteResponse, id) -> {
@@ -98,7 +97,7 @@ public class ClienteService {
         JsonNode clientesNode = jsonNode.get("record");
         ClienteResponseWrapperDTO clientes = objectMapper.readValue(clientesNode.traverse(), new TypeReference<ClienteResponseWrapperDTO>(){});
         List<ClienteResponse> clienteList = clientes.getClientesResponseV2List().stream().sorted(Comparator.comparing(ClienteResponse::getNome)).collect(Collectors.toList());
-        clienteList.forEach(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento);
+        clienteList.forEach(birthdayToDateOfBirth::formatarAniversarioParaDataNascimento);
         ClienteWrapper clienteWrapper = new ClienteWrapper();
         clienteWrapper.setClienteResponses(paginarLista(clienteList, pageable));
         clienteWrapper.setMetaData(new MetaData(clienteList.size()));
@@ -117,7 +116,7 @@ public class ClienteService {
                 .map(ClienteJsonParser::mapearParaClientesWrapperDTO)
                 .flatMap(clientes -> {
                     Flux<ClienteResponseV2> flux = Flux.fromIterable(clientes.getClientesResponseV2List())
-                            .map(AniversarioParaDNConversor::formatarAniversarioParaDataNascimento)
+                            .map(birthdayToDateOfBirth::formatarAniversarioParaDataNascimento)
                             .sort(Comparator.comparing(ClienteResponseV2::getNome))
                             .zipWith(Flux.range(1, clientes.getClientesResponseV2List().size()),
                                     (clienteResponse, id) -> {
