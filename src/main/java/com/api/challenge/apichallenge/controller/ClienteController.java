@@ -1,6 +1,7 @@
 package com.api.challenge.apichallenge.controller;
 
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
+import com.api.challenge.apichallenge.exception.CorruptedDataOnCSVFileException;
 import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
 import com.api.challenge.apichallenge.exception.MissingClienteParametersException;
 import com.api.challenge.apichallenge.response.Response;
@@ -12,6 +13,7 @@ import com.api.challenge.apichallenge.controller.openapi.ClienteOpenApiImpl;
 import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.search.ClienteRequestParam;
 import com.api.challenge.apichallenge.service.ClienteService;
+import com.opencsv.exceptions.CsvException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -64,7 +66,7 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @PostMapping("/v2/adicionarPessoaCSV")
-    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@Valid @RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
+    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@Valid @RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException, CsvException, CorruptedDataOnCSVFileException {
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.escreverNovaLinhaCSV(clienteRequest));
     }
 
@@ -77,7 +79,7 @@ public class ClienteController implements ClienteOpenApiImpl {
             @RequestParam(value = "mes", required = false) String mes,
             @RequestParam(value = "dia", required = false) String dia,
             @RequestParam(value = "data_nasc_min", required = false) String dataNascMin,
-            @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) throws  FileNotFoundException {
+            @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) throws IOException, CsvException, CorruptedDataOnCSVFileException {
         ClienteRequestParam clienteRequestParam = new ClienteRequestParam(idadeMin, idadeMax, sexo, mes, dia, dataNascMin, dataNascMax);
         return ResponseEntity.status(HttpStatus.OK).body(clienteService.readCSV(clienteRequestParam, pageable));
     }
@@ -88,7 +90,7 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @DeleteMapping("/v2/deletarPessoaCSV/{id}")
-    public ResponseEntity<Response> deleteCSVFile(@PathVariable Integer id) throws IOException, ClienteInCSVNotFoundException {
+    public ResponseEntity<Response> deleteCSVFile(@PathVariable Integer id) throws IOException, ClienteInCSVNotFoundException, CsvException, CorruptedDataOnCSVFileException {
         clienteService.deleteCSVFile(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new Response(204, "Delatado com sucesso"));
     }

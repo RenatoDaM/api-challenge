@@ -1,6 +1,7 @@
 package com.api.challenge.apichallenge.controller.openapi;
 
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
+import com.api.challenge.apichallenge.exception.CorruptedDataOnCSVFileException;
 import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
 import com.api.challenge.apichallenge.exception.MissingClienteParametersException;
 import com.api.challenge.apichallenge.pagination.CustomPageable;
@@ -10,6 +11,7 @@ import com.api.challenge.apichallenge.response.Response;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.response.v2.ClienteWrapperV2;
+import com.opencsv.exceptions.CsvException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -82,7 +84,7 @@ public interface ClienteOpenApiImpl {
             @ApiResponse(description = "Data de nascimento inválida. Exemplo de formato correto: 01-01-1997.", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(description = "Campos não preenchidos corretamente", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@Valid @RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException;
+    public ResponseEntity<ClienteRequest> adicionarPessoaCSV(@Valid @RequestBody ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException, CsvException, CorruptedDataOnCSVFileException;
 
     @Operation(summary = "Retorna uma lista de clientes filtrados com base em vários parâmetros de consulta a partir do arquivo CSV",
             description = "Este endpoint retorna uma lista de clientes filtrados a partir do arquivo CSV com base nos parâmetros de consulta fornecidos. Os parâmetros de consulta são opcionais e podem ser usados em qualquer combinação.")
@@ -106,7 +108,7 @@ public interface ClienteOpenApiImpl {
             @RequestParam(value = "mes", required = false) String mes,
             @RequestParam(value = "dia", required = false) String dia,
             @RequestParam(value = "data_nasc_min", required = false) String dataNascMin,
-            @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) throws FileNotFoundException;
+            @RequestParam(value = "data_nasc_max", required = false) String dataNascMax) throws IOException, CsvException, CorruptedDataOnCSVFileException;
 
     @Operation(summary = "Atualiza um cliente dentro do CSV. Lê o objeto no body do JSON e atualiza o objeto com o mesmo ID.")
     @ApiResponses(value = {
@@ -120,5 +122,5 @@ public interface ClienteOpenApiImpl {
             @ApiResponse(description = "Cliente deletado", responseCode = "201", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Response.class))),
             @ApiResponse(description = "Operação delete falhou. Não foi possível encontrar um cliente com o ID fornecido.", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<Response> deleteCSVFile(@PathVariable Integer id) throws IOException, ClienteInCSVNotFoundException;
+    public ResponseEntity<Response> deleteCSVFile(@PathVariable Integer id) throws IOException, ClienteInCSVNotFoundException, CsvException, CorruptedDataOnCSVFileException;
 }

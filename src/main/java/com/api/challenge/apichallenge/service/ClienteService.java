@@ -3,6 +3,7 @@ package com.api.challenge.apichallenge.service;
 import com.api.challenge.apichallenge.dao.ClienteDAO;
 import com.api.challenge.apichallenge.dto.v1.ClienteResponseWrapperDTO;
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
+import com.api.challenge.apichallenge.exception.CorruptedDataOnCSVFileException;
 import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
 import com.api.challenge.apichallenge.exception.MissingClienteParametersException;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.exceptions.CsvException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -45,7 +47,7 @@ public class ClienteService {
     @Autowired
     ClienteDAO clienteDAO;
 
-    public ClienteRequest escreverNovaLinhaCSV(ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException {
+    public ClienteRequest escreverNovaLinhaCSV(ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException, CsvException, CorruptedDataOnCSVFileException {
         if (clienteRequest.getDataNascimento() == null || clienteRequest.getIdade() == null || clienteRequest.getSexo() == null || clienteRequest.getNome() == null) {
             throw new MissingClienteParametersException("Parâmetro(s) obrigatório(s) não preenchido(s). Favor preencher corretamente.");
         }
@@ -59,11 +61,11 @@ public class ClienteService {
         return clienteCSVHandler.updateCSV(clienteRequest);
     }
 
-    public void deleteCSVFile(Integer id) throws IOException, ClienteInCSVNotFoundException {
+    public void deleteCSVFile(Integer id) throws IOException, ClienteInCSVNotFoundException, CsvException, CorruptedDataOnCSVFileException {
         clienteCSVHandler.deleteCSVLine(id);
     }
 
-    public ClienteWrapperV2 readCSV(ClienteRequestParam clienteRequestParam, CustomPageable customPageable) throws FileNotFoundException {
+    public ClienteWrapperV2 readCSV(ClienteRequestParam clienteRequestParam, CustomPageable customPageable) throws IOException, CsvException, CorruptedDataOnCSVFileException {
         List<ClienteResponseV2> clienteResponseV2List = ClienteFilter.filterClienteCSV(clienteCSVHandler.read(), clienteRequestParam);
         Page<ClienteResponseV2> clienteResponseV2Page = paginarCSV(clienteResponseV2List, customPageable);
         return new ClienteWrapperV2(clienteResponseV2Page, new MetaData(clienteResponseV2List.size()));
