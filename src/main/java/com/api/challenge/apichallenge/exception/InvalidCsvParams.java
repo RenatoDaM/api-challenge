@@ -4,16 +4,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class InvalidDateOfBirth extends Exception {
-    public InvalidDateOfBirth() {
+public class InvalidCsvParams extends Exception {
+    public InvalidCsvParams() {
         super();
     }
 
-    public InvalidDateOfBirth(String msg) {
+    public InvalidCsvParams(String msg) {
         super(msg);
     }
 
-    public InvalidDateOfBirth(String msg, Throwable cause) {
+    public InvalidCsvParams(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

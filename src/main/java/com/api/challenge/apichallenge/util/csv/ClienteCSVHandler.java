@@ -2,7 +2,7 @@ package com.api.challenge.apichallenge.util.csv;
 
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
 import com.api.challenge.apichallenge.exception.CorruptedDataOnCSVFileException;
-import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
+import com.api.challenge.apichallenge.exception.InvalidCsvParams;
 import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.opencsv.CSVParserBuilder;
@@ -12,12 +12,9 @@ import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.exceptions.CsvException;
 import com.opencsv.exceptions.CsvValidationException;
-import org.apache.logging.slf4j.SLF4JLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.spi.LoggerFactoryBinder;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -37,7 +34,7 @@ public class ClienteCSVHandler {
     }
 
 
-    public ClienteRequest writeNewLine(ClienteRequest pessoa) throws IOException, InvalidDateOfBirth, CsvException, CorruptedDataOnCSVFileException {
+    public ClienteRequest writeNewLine(ClienteRequest pessoa) throws IOException, InvalidCsvParams, CsvException, CorruptedDataOnCSVFileException {
         FileWriter fileWriter = new FileWriter(FILE_PATH + CSV_FILE_NAME, true);
         CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
         List<ClienteResponseV2> clientesList = read();
@@ -46,10 +43,18 @@ public class ClienteCSVHandler {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(pessoa.getDataNascimento());
 
+
+
         if (matcher.find()) {
             ClienteResponseV2 clienteResponseV2 = clientesList.get(clientesList.size() - 1);
             String[] linha = {Integer.toString(clienteResponseV2.getId() + 1), pessoa.getNome(),
                     Integer.toString(pessoa.getIdade()), pessoa.getSexo(), pessoa.getDataNascimento()};
+
+            if (!linha[2].matches("^[FM]$")) {
+                logger.error("Invalid biologic gender");
+                throw new InvalidCsvParams("Invalid biologic gender. Please insert a valid biologic gender (F or M)");
+            }
+
             csvWriter.writeNext(linha);
             csvWriter.close();
             pessoa.setId(clienteResponseV2.getId() + 1);
@@ -57,7 +62,7 @@ public class ClienteCSVHandler {
             return pessoa;
         } else {
             logger.error("Invalid date of birth. Example of correct use: 01-01-1997");
-            throw new InvalidDateOfBirth("Data de nascimento inválida. Exemplo de formato correto: 01-01-1997.");
+            throw new InvalidCsvParams("Data de nascimento inválida. Exemplo de formato correto: 01-01-1997.");
         }
 
     }
@@ -69,6 +74,7 @@ public class ClienteCSVHandler {
 
         String[] linha = {Integer.toString(pessoa.getId()), pessoa.getNome(),
                 Integer.toString(pessoa.getIdade()), pessoa.getSexo(), pessoa.getDataNascimento()};
+
         if (linha[0].equals("1")) {
             csvWriter.writeNext(CSV_HEADERS);
         }
@@ -95,7 +101,7 @@ public class ClienteCSVHandler {
         return clienteList;
     }
 
-    public ClienteRequest updateCSV(ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth {
+    public ClienteRequest updateCSV(ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidCsvParams {
         CSVReader csvReader = new CSVReaderBuilder(new FileReader(FILE_PATH + CSV_FILE_NAME))
                 .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
                 .build();
@@ -123,11 +129,12 @@ public class ClienteCSVHandler {
             reescreverCSVRequest(clienteList);
             return clienteRequest;
         } else {
-            throw new InvalidDateOfBirth("Data de nascimento inválida. Exemplo de formato correto: 01-01-1997.");
+            throw new InvalidCsvParams("Data de nascimento inválida. Exemplo de formato correto: 01-01-1997.");
         }
     }
 
-    public void deleteCSVLine(Integer id) throws IOException, ClienteInCSVNotFoundException, CsvException, CorruptedDataOnCSVFileException {
+    public void deleteCSVLineById(Integer id) throws IOException, ClienteInCSVNotFoundException, CsvException, CorruptedDataOnCSVFileException {
+
         List<ClienteResponseV2> clienteList = read();
         List<ClienteResponseV2> novaLista = new ArrayList<>();
         boolean idEncontrado = false;
@@ -179,16 +186,23 @@ public class ClienteCSVHandler {
                 .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
                 .build();
 
-        String[] header = csvReader2.readNext();
-        int numColumns = header.length;
         String[] line;
-        int lineNumber = 1; // começa em 2 porque a primeira linha é o cabeçalho
+        int lineNumber = 2;
+
+        //descarta o cabeçalho
+        csvReader2.readNext();
+
         while ((line = csvReader2.readNext()) != null) {
             lineNumber++;
-            // verificar se a linha tem o número correto de colunas
             if (!line[0].matches("^[0-9]+$")) {
-                logger.error("Error on line {}, it is corrupted or some data has been manually inserted incorrectly. Please fix or remove it.", lineNumber);
+                System.out.println(line[0]);
+                logger.error("Error on line {}, it is corrupted or some data has been manually inserted incorrectly. Please fix or remove it. Corrupted date value: {}", lineNumber, line[0]);
                 throw new CorruptedDataOnCSVFileException("Error on line " + lineNumber + ", it is corrupted or some data has been manually inserted incorrectly. Please fix or remove it.");
+            }
+
+            if (!line[2].matches("^[0-9]+$")) {
+                logger.error("Error on line {}, it is corrupted or some data has been manually inserted incorrectly. Please fix or remove it. Corrupted date value: {}", lineNumber, line[2]);
+                throw new CorruptedDataOnCSVFileException("Error on line " + lineNumber + ", it is corrupted or some data has been manually inserted incorrectly. Please fix or remove it. ");
             }
         }
     }

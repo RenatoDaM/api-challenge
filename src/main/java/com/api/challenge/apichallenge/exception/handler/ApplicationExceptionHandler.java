@@ -26,8 +26,8 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    @ExceptionHandler(value = {InvalidDateOfBirth.class})
-    public ResponseEntity<ErrorResponse> invalidAteOfBirth(InvalidDateOfBirth e) {
+    @ExceptionHandler(value = {InvalidCsvParams.class})
+    public ResponseEntity<ErrorResponse> invalidAteOfBirth(InvalidCsvParams e) {
         ErrorResponse errorResponse = new ErrorResponse(400, e.getMessage());
         errorResponse.setTimestamp(LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

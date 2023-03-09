@@ -4,7 +4,7 @@ import com.api.challenge.apichallenge.dao.ClienteDAO;
 import com.api.challenge.apichallenge.dto.v1.ClienteResponseWrapperDTO;
 import com.api.challenge.apichallenge.exception.ClienteInCSVNotFoundException;
 import com.api.challenge.apichallenge.exception.CorruptedDataOnCSVFileException;
-import com.api.challenge.apichallenge.exception.InvalidDateOfBirth;
+import com.api.challenge.apichallenge.exception.InvalidCsvParams;
 import com.api.challenge.apichallenge.exception.MissingClienteParametersException;
 import com.api.challenge.apichallenge.response.v1.ClienteWrapper;
 import com.api.challenge.apichallenge.pagination.CustomPageImpl;
@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -47,14 +46,14 @@ public class ClienteService {
     @Autowired
     ClienteDAO clienteDAO;
 
-    public ClienteRequest escreverNovaLinhaCSV(ClienteRequest clienteRequest) throws IOException, InvalidDateOfBirth, MissingClienteParametersException, CsvException, CorruptedDataOnCSVFileException {
+    public ClienteRequest escreverNovaLinhaCSV(ClienteRequest clienteRequest) throws IOException, InvalidCsvParams, MissingClienteParametersException, CsvException, CorruptedDataOnCSVFileException {
         if (clienteRequest.getDataNascimento() == null || clienteRequest.getIdade() == null || clienteRequest.getSexo() == null || clienteRequest.getNome() == null) {
             throw new MissingClienteParametersException("Parâmetro(s) obrigatório(s) não preenchido(s). Favor preencher corretamente.");
         }
         return clienteCSVHandler.writeNewLine(clienteRequest);
     }
 
-    public ClienteRequest updateCSV(ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidDateOfBirth, MissingClienteParametersException {
+    public ClienteRequest updateCSV(ClienteRequest clienteRequest) throws IOException, ClienteInCSVNotFoundException, InvalidCsvParams, MissingClienteParametersException {
         if (clienteRequest.getDataNascimento() == null || clienteRequest.getIdade() == null || clienteRequest.getSexo() == null || clienteRequest.getNome() == null) {
             throw new MissingClienteParametersException("Parâmetro(s) obrigatório(s) não preenchido(s). Favor preencher corretamente.");
         }
@@ -62,7 +61,7 @@ public class ClienteService {
     }
 
     public void deleteCSVFile(Integer id) throws IOException, ClienteInCSVNotFoundException, CsvException, CorruptedDataOnCSVFileException {
-        clienteCSVHandler.deleteCSVLine(id);
+        clienteCSVHandler.deleteCSVLineById(id);
     }
 
     public ClienteWrapperV2 readCSV(ClienteRequestParam clienteRequestParam, CustomPageable customPageable) throws IOException, CsvException, CorruptedDataOnCSVFileException {
