@@ -88,7 +88,7 @@ public class ClienteService {
                             try {
                                 clienteCSVHandler.consumesApiToCSV(client1);
                                 System.out.println(client1.getNome());
-                            } catch (IOException e) {
+                            } catch (IOException | CorruptedDataOnCSVFileException | CsvException e) {
                                 throw new RuntimeException(e);
                             }
                         }));

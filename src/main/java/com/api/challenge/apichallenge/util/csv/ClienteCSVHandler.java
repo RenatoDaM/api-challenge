@@ -67,7 +67,7 @@ public class ClienteCSVHandler {
 
     }
 
-    public void consumesApiToCSV(ClienteResponseV2 pessoa) throws IOException {
+    public void consumesApiToCSV(ClienteResponseV2 pessoa) throws IOException, CorruptedDataOnCSVFileException, CsvException {
         FileWriter fileWriter = new FileWriter(FILE_PATH + CSV_FILE_NAME, true);
 
         CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
@@ -75,7 +75,10 @@ public class ClienteCSVHandler {
         String[] linha = {Integer.toString(pessoa.getId()), pessoa.getNome(),
                 Integer.toString(pessoa.getIdade()), pessoa.getSexo(), pessoa.getDataNascimento()};
 
-        if (linha[0].equals("1")) {
+        List<ClienteResponseV2> clienteResponseV2List = read();
+
+
+        if (clienteResponseV2List.isEmpty()) {
             csvWriter.writeNext(CSV_HEADERS);
         }
         csvWriter.writeNext(linha);
@@ -187,13 +190,15 @@ public class ClienteCSVHandler {
                 .build();
 
         String[] line;
-        int lineNumber = 2;
+        int lineNumber = 1;
 
         //descarta o cabeçalho
         csvReader2.readNext();
 
         while ((line = csvReader2.readNext()) != null) {
             lineNumber++;
+
+
             if (!line[0].matches("^[0-9]+$")) {
                 System.out.println(line[0]);
                 logger.error("Error on line {}, it is corrupted or some data has been manually inserted incorrectly. Please fix or remove it. Corrupted date value: {}", lineNumber, line[0]);
