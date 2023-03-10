@@ -51,10 +51,6 @@ public class ClienteCSVHandler {
             String[] linha = {Integer.toString(clienteResponseV2.getId() + 1), pessoa.getNome(),
                     Integer.toString(pessoa.getIdade()), pessoa.getSexo(), pessoa.getDataNascimento()};
 
-            if (!linha[2].matches("^[FM]$")) {
-                logger.error("Invalid biologic gender");
-                throw new InvalidCsvParams("Invalid biologic gender. Please insert a valid biologic gender (F or M)");
-            }
 
             csvWriter.writeNext(linha);
             csvWriter.close();
