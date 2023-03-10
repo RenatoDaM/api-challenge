@@ -33,6 +33,7 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,26 +73,42 @@ public class ClienteService {
     // POST
     @SuppressWarnings("unchecked")
     @JsonProperty("brand")
-    public Flux<ClienteResponseV2> criarArquivoCSV() {
+    public Flux<ClienteResponseV2> criarArquivoCSV() throws IOException, CorruptedDataOnCSVFileException, CsvException {
+        int ultimoId;
+        // preciso arrumar isso. Quero numerar o id pelo ultimo elemento da lista e caso nao haja nenhum elemento,, vai ser 1
+        // TA DANDO ERRO PRA ACHAR O LOCAL DO ARQUIVO...
+        // PROVAVEL NESSE TRY AQUI ,TENTANDO LER....
+        try {
+            ultimoId = clienteCSVHandler.read().get(clienteCSVHandler.read().size()-1).getId();
+        } catch (IndexOutOfBoundsException e) {
+            ultimoId = 0;
+            System.err.println("A lista está vazia. Os id's da API consumida irão começar por 1 já que não foi encontrado o último ID da lista de clientes.");
+        }
+
+        int finalUltimoId = ultimoId;
         return clienteDAO.postCSV()
                 .map(ClienteJsonParser::pegarJsonNode)
                 .map(ClienteJsonParser::extrairNodeClientes)
                 .map(ClienteJsonParser::mapearParaClientesWrapperDTO)
-                .flatMap(clientes -> Flux.fromIterable(clientes.getClientesResponseV2List())
-                        .map(BirthdayToDateOfBirth::convertBirthdayToDateOfBirthV2)
-                        .sort(Comparator.comparing(ClienteResponseV2::getNome))
-                        .zipWith(Flux.range(1, clientes.getClientesResponseV2List().size()),
-                                (clienteResponse, id) -> {
-                                    clienteResponse.setId(id);
-                                    return clienteResponse;
-                                }).doOnNext(client1 -> {
-                            try {
-                                clienteCSVHandler.consumesApiToCSV(client1);
-                                System.out.println(client1.getNome());
-                            } catch (IOException | CorruptedDataOnCSVFileException | CsvException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }));
+                .flatMap(clientes -> {
+                    return Flux.fromIterable(clientes.getClientesResponseV2List())
+                            .map(BirthdayToDateOfBirth::convertBirthdayToDateOfBirthV2)
+                            .sort(Comparator.comparing(ClienteResponseV2::getNome))
+                            // CONTANTO QUE SEJA APENAS UM ARQUIVO A LÓGICA DE DEFINIR ID's FUNCIONA, PORÉM, AO TER MAIS ARQUIVOS
+                            // SERIA NECESSÁRIO UMA FORMA DE DEFINIR O ID MAIOR, PRA NUNCA ESTAR REPETINDO.
+                            .zipWith(Flux.range(finalUltimoId+1, clientes.getClientesResponseV2List().size()),
+                                    (clienteResponse, id) -> {
+                                        clienteResponse.setId(id);
+                                        return clienteResponse;
+                                    }).doOnNext(client1 -> {
+                                try {
+                                    clienteCSVHandler.consumesApiToCSV(client1);
+                                    System.out.println(client1.getNome());
+                                } catch (IOException | CorruptedDataOnCSVFileException | CsvException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                });
     }
     // GET
     @SuppressWarnings("unchecked")

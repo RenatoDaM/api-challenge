@@ -15,6 +15,7 @@ import com.opencsv.exceptions.CsvValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -87,12 +88,18 @@ public class ClienteCSVHandler {
     }
 
     public List<ClienteResponseV2> read() throws IOException, CsvException, CorruptedDataOnCSVFileException {
-
-        validateCSVFile();
+        // Faço essa checagem pois ao postar o arquivo csv eu uso esse método para pegar o ID do último cliente
+        File file = new File(FILE_PATH + CSV_FILE_NAME);
+        if (!file.exists()) {
+            file.createNewFile();
+        }
 
         CSVReader csvReader = new CSVReaderBuilder(new FileReader(FILE_PATH + CSV_FILE_NAME))
                 .withCSVParser(new CSVParserBuilder().withSeparator(';').build())
                 .build();
+
+        validateCSVFile();
+
         List<ClienteResponseV2> clienteList = new CsvToBeanBuilder(csvReader)
                 .withType(ClienteResponseV2.class)
                 .withFilter(new ClienteCSVIsFirstLine())

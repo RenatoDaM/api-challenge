@@ -60,7 +60,7 @@ public class ClienteController implements ClienteOpenApiImpl {
     }
 
     @PostMapping("/v2/criarCSV")
-    public ResponseEntity<Flux<ClienteResponseV2>> postarCSV() {
+    public ResponseEntity<Flux<ClienteResponseV2>> postarCSV() throws IOException, CorruptedDataOnCSVFileException, CsvException {
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.criarArquivoCSV());
     }
 

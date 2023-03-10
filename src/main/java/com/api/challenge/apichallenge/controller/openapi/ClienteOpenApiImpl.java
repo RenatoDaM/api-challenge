@@ -75,7 +75,7 @@ public interface ClienteOpenApiImpl {
 
     @Operation(summary = "Cria um arquivo CSV no diretório definido na API a partir do GET realizado na API mockada.")
     @ApiResponse(description = "Cria um arquivo CSV no diretório padrão definido na aplicação. O arquivo CSV contém a lista recebida através do GET da API mockada. Essa requisição reescreve o arquivo caso já exista.", responseCode = "201", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Response.class)))
-    public ResponseEntity<Flux<ClienteResponseV2>> postarCSV();
+    public ResponseEntity<Flux<ClienteResponseV2>> postarCSV() throws IOException, CorruptedDataOnCSVFileException, CsvException;
 
     @Operation(summary = "Adiciona um cliente ao arquivo CSV no formato padrão separado por ;")
     @ApiResponses(value = {
