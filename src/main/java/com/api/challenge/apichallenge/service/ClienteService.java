@@ -75,9 +75,7 @@ public class ClienteService {
     @JsonProperty("brand")
     public Flux<ClienteResponseV2> criarArquivoCSV() throws IOException, CorruptedDataOnCSVFileException, CsvException {
         int ultimoId;
-        // preciso arrumar isso. Quero numerar o id pelo ultimo elemento da lista e caso nao haja nenhum elemento,, vai ser 1
-        // TA DANDO ERRO PRA ACHAR O LOCAL DO ARQUIVO...
-        // PROVAVEL NESSE TRY AQUI ,TENTANDO LER....
+        // tenta pegar o ultimo id do arquivo pra começar a colocar ids após esse
         try {
             ultimoId = clienteCSVHandler.read().get(clienteCSVHandler.read().size()-1).getId();
         } catch (IndexOutOfBoundsException e) {
