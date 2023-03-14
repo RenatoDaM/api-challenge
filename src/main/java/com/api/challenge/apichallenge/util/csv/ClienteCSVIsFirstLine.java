@@ -7,7 +7,7 @@ public class ClienteCSVIsFirstLine implements CsvToBeanFilter {
 
     @Override
     public boolean allowLine(String[] line) {
-        if (isFirstLine) {
+        if (isFirstLine || line[0].equals("Id")) {
             isFirstLine = false;
             return false;
         }

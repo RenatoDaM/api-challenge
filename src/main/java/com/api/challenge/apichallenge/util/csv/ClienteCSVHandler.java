@@ -69,18 +69,25 @@ public class ClienteCSVHandler {
 
         CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
 
-        String[] linha = {Integer.toString(pessoa.getId()), pessoa.getNome(),
-                Integer.toString(pessoa.getIdade()), pessoa.getSexo(), pessoa.getDataNascimento()};
 
-        List<ClienteResponseV2> clienteResponseV2List = read();
+        // este método em algum lugar é chamado não da melhor forma (provável na service getv2), fazendo o objeto pessoa no parâmetro vir
+        // o header, assim falhando na conversão. Coloquei as ações dentro de um if por conta disso, porém,
+        // o problema não esta de fato resolvido, fiz apenas uma gambiarra.
+        if (!pessoa.getId().equals("Id")) {
+            String[] linha = {Integer.toString(pessoa.getId()), pessoa.getNome(),
+                    Integer.toString(pessoa.getIdade()), pessoa.getSexo(), pessoa.getDataNascimento()};
+
+            List<ClienteResponseV2> clienteResponseV2List = read();
 
 
-        if (clienteResponseV2List.isEmpty()) {
-            csvWriter.writeNext(CSV_HEADERS);
+
+            if (clienteResponseV2List.isEmpty()) {
+                csvWriter.writeNext(CSV_HEADERS);
+            }
+            csvWriter.writeNext(linha);
+
+            csvWriter.close();
         }
-        csvWriter.writeNext(linha);
-
-        csvWriter.close();
     }
 
     public List<ClienteResponseV2> read() throws IOException, CsvException, CorruptedDataOnCSVFileException {
@@ -95,7 +102,9 @@ public class ClienteCSVHandler {
                 .build();
 
         validateCSVFile();
-
+        // Ao ler às vezes acontece o erro dele tentar ler o header e transformar em valor numérico o campo "Id"
+        // Então na classe ClienteCSVIsFirstLine eu adicionei mais uma condição com operador ||, sendo ela
+        // ler o primeiro campo, no caso se o valor for igual a "Id".
         List<ClienteResponseV2> clienteList = new CsvToBeanBuilder(csvReader)
                 .withType(ClienteResponseV2.class)
                 .withFilter(new ClienteCSVIsFirstLine())
