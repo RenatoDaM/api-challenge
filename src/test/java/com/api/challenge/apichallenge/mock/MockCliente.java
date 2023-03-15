@@ -7,7 +7,7 @@ import java.util.List;
 
 public class MockCliente {
 
-    public List<ClienteResponseV2> mockClienteV2List() {
+    public static List<ClienteResponseV2> mockClienteV2List() {
         List<ClienteResponseV2> clienteList = new ArrayList<>();
         ClienteResponseV2 cliente1 = new ClienteResponseV2(1, "Renato", 23, "M", "28-12-1999");
         ClienteResponseV2 cliente2 = new ClienteResponseV2(2, "Anderson", 25, "M", "28-12-1997");
@@ -21,7 +21,7 @@ public class MockCliente {
         return clienteList;
     }
 
-    public ClienteResponseV2 mockCliente(Integer id) {
+    public static ClienteResponseV2 mockCliente(Integer id) {
         ClienteResponseV2 clienteResponseV2 = new ClienteResponseV2();
         clienteResponseV2.setId(id);
 

@@ -2,10 +2,12 @@ package com.api.challenge.apichallenge.integrationtests;
 
 import com.api.challenge.apichallenge.config.HeadersDefault;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+import static org.junit.jupiter.api.Assertions.*;
+
 public class UriConnectionClientesJsonTest {
     @Test
     public void UriConnectionTest() {
