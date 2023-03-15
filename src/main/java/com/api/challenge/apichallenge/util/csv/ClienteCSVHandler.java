@@ -223,4 +223,12 @@ public class ClienteCSVHandler {
             }
         }
     }
+
+    public void turnsCsvFileBlank() throws IOException {
+        FileWriter fileWriter = new FileWriter(FILE_PATH + CSV_FILE_NAME);
+        CSVWriter csvWriter = new CSVWriter(fileWriter, ';', '"', '"', "\n");
+
+        csvWriter.writeNext(null);
+        csvWriter.close();
+    }
 }

@@ -8,11 +8,9 @@ import com.api.challenge.apichallenge.request.ClienteRequest;
 import com.api.challenge.apichallenge.response.v2.ClienteResponseV2;
 import com.api.challenge.apichallenge.util.csv.ClienteCSVHandler;
 import com.opencsv.exceptions.CsvException;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -75,5 +73,7 @@ public class CsvHandlerTest {
         clienteCSVHandler.deleteCSVLineById(5);
 
         assertTrue(clienteCSVHandler.read().isEmpty());
+        clienteCSVHandler.turnsCsvFileBlank();
     }
+
 }
