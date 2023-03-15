@@ -22,6 +22,13 @@ public class ClienteResponseV2 {
     @CsvBindByPosition(position = 4)
     String dataNascimento;
 
+    public ClienteResponseV2(Integer id, String nome, int idade, String sexo, String dataNascimento) {
+        this.id = id;
+        this.nome = nome;
+        this.idade = idade;
+        this.sexo = sexo;
+        this.dataNascimento = dataNascimento;
+    }
 
     public ClienteResponseV2() {
 
