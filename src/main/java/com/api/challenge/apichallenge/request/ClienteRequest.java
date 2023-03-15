@@ -36,6 +36,22 @@ public class ClienteRequest {
     public ClienteRequest() {
 
     }
+
+    public ClienteRequest(String nome, Integer idade, String sexo, String dataNascimento) {
+        this.nome = nome;
+        this.idade = idade;
+        this.sexo = sexo;
+        this.dataNascimento = dataNascimento;
+    }
+
+    public ClienteRequest(Integer id, String nome, Integer idade, String sexo, String dataNascimento) {
+        this.id = id;
+        this.nome = nome;
+        this.idade = idade;
+        this.sexo = sexo;
+        this.dataNascimento = dataNascimento;
+    }
+
     public Integer getId() {
         return id;
     }
